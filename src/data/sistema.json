@@ -1,0 +1,1282 @@
+{
+  "metadados": {
+    "sistema": "Mitos do Caos RPG",
+    "versao": "Playtest Fast",
+    "foco": "Narrativa, Investigação e Horror Cósmico-Mitológico",
+    "nivel_minimo": 1,
+    "nivel_maximo_playtest": 8,
+    "nivel_maximo_sistema": 20,
+    "limite_dados_rolagem": 5
+  },
+  "dados_escala": {
+    "D4": {
+      "faces": 4,
+      "grau": "Leigo",
+      "descricao": "Sem desenvolvimento ou conhecimento. Representa a média humana comum ou inexperiente."
+    },
+    "D6": {
+      "faces": 6,
+      "grau": "Iniciado",
+      "descricao": "Conhece ou desenvolveu minimamente, já ouviu falar ou possui treinamento básico."
+    },
+    "D10": {
+      "faces": 10,
+      "grau": "Competente / Estudado",
+      "descricao": "Sabe do assunto a fundo, estudou formalmente sobre ou se desenvolveu ativamente."
+    },
+    "D12": {
+      "faces": 12,
+      "grau": "Especialista / Ápice",
+      "descricao": "Especialista no assunto, formado ou o ápice do desenvolvimento humano."
+    },
+    "D8": {
+      "faces": 8,
+      "tipo": "Dado Especial do Caos",
+      "descricao": "Reservado exclusivamente para os Dados do Caos (Mantra e Karma), apostas com Entidades e rolagens específicas."
+    }
+  },
+  "criacao_personagem": {
+    "pool_atributos": {
+      "D10": 1,
+      "D6": 2,
+      "D4": 3
+    },
+    "pool_pericias": {
+      "D6": 4,
+      "D4": 2
+    },
+    "akasha_inicial": 2,
+    "pontos_caos_inicial": 1,
+    "karma_atual_inicial": "Neutro",
+    "equipamento_inicial": {
+      "armas": 1,
+      "itens_suporte": 1,
+      "besteirol": "Ilimitado"
+    }
+  },
+  "atributos": [
+    {
+      "id": "forca",
+      "nome": "Força",
+      "sigla": "FOR",
+      "descricao": "Define o quão forte fisicamente o personagem é.",
+      "exemplos": "Capacidade de carga, força muscular, destruição física.",
+      "impacto_mecanico": "Combina com perícias físicas como Esforço."
+    },
+    {
+      "id": "inteligencia",
+      "nome": "Inteligência",
+      "sigla": "INT",
+      "descricao": "Define a genialidade, raciocínio lógico e intelecto do personagem.",
+      "exemplos": "Análise dedutiva, memória, erudição e genialidade científica.",
+      "impacto_mecanico": "Determina a Sanidade Máxima (Equilíbrio Inicial e por Nível)."
+    },
+    {
+      "id": "agilidade",
+      "nome": "Agilidade",
+      "sigla": "AGI",
+      "descricao": "Define os reflexos, coordenação motora e velocidade de reação do personagem.",
+      "exemplos": "Rapidez corporal, reflexos evasivos e tempo de reação.",
+      "impacto_mecanico": "Combina com perícias como Destreza para esquiva e ataques rápidos."
+    },
+    {
+      "id": "vitalidade",
+      "nome": "Vitalidade",
+      "sigla": "VIT",
+      "descricao": "Define a resistência biológica, saúde e fôlego corporal do personagem.",
+      "exemplos": "Vigor físico, tolerância imunológica e absorção de dano.",
+      "impacto_mecanico": "Determina a Vida Máxima (Vida Inicial e por Nível)."
+    },
+    {
+      "id": "aparencia",
+      "nome": "Aparência",
+      "sigla": "APA",
+      "descricao": "Define o magnetismo pessoal, beleza física e capacidade de atrair atenção.",
+      "exemplos": "Presença estética, intimidação visual e charme magnético.",
+      "impacto_mecanico": "Combina com Social em interações humanas e de sedução/destaque."
+    },
+    {
+      "id": "instinto",
+      "nome": "Instinto",
+      "sigla": "INS",
+      "descricao": "Define a percepção espacial, física e sensibilidade extra-sensorial ao Caos.",
+      "exemplos": "Sexto sentido, pressentir emboscadas e conexões cósmicas.",
+      "impacto_mecanico": "Combina com Sentidos para percepção antecipada de perigos."
+    }
+  ],
+  "pericias": [
+    {
+      "id": "esforco",
+      "nome": "Esforço",
+      "descricao": "Perícias que envolvem esforço físico muscular e impacto direto.",
+      "exemplos": [
+        "Arrastar",
+        "Luta Corporal",
+        "Empurrar",
+        "Quebrar",
+        "Erguer"
+      ],
+      "papel_combate": "Perícia primária de Ataque Corpo a Corpo."
+    },
+    {
+      "id": "mente",
+      "nome": "Mente",
+      "descricao": "Perícias que envolvem pensar, investigar, deduzir e analisar.",
+      "exemplos": [
+        "Investigação",
+        "Tática",
+        "Tecnologia",
+        "Ocultismo",
+        "Medicina"
+      ],
+      "papel_combate": "Identificação de fraquezas e resistências mentais."
+    },
+    {
+      "id": "destreza",
+      "nome": "Destreza",
+      "descricao": "Perícias onde a velocidade de mãos, agilidade e precisão motora são vitais.",
+      "exemplos": [
+        "Dirigir",
+        "Acrobacia",
+        "Furtividade",
+        "Prestidigitação",
+        "Pontaria"
+      ],
+      "papel_combate": "Perícia de Ataque Ágil/Distância e Perícia de Esquiva."
+    },
+    {
+      "id": "resistencia",
+      "nome": "Resistência",
+      "descricao": "Perícias ligadas à tolerância corporal, fôlego e firmeza física.",
+      "exemplos": [
+        "Fôlego",
+        "Fortitude",
+        "Defender",
+        "Suportar Venenos/Dor"
+      ],
+      "papel_combate": "Perícia de Esquiva / Absorção Corporal e Bloqueio."
+    },
+    {
+      "id": "social",
+      "nome": "Social",
+      "descricao": "Perícias focadas em interações interpessoais, diálogo e manipulação.",
+      "exemplos": [
+        "Enganação",
+        "Acalmar",
+        "Persuasão",
+        "Intimidação",
+        "Negociação"
+      ],
+      "papel_combate": "Distração de oponentes e remoção de efeitos de Limiar (DT 12)."
+    },
+    {
+      "id": "sentidos",
+      "nome": "Sentidos",
+      "descricao": "Perícias ligadas à percepção sensorial e alerta humano.",
+      "exemplos": [
+        "Intuição",
+        "Ouvir",
+        "Percepção Visual",
+        "Notar Pistas",
+        "Olfato"
+      ],
+      "papel_combate": "Prevenção de ataques surpresa e mira perceptiva."
+    }
+  ],
+  "atuacoes": [
+    {
+      "id": "celere",
+      "nome": "Célere",
+      "perfil": "Combatente veloz feito para estar sempre de prontidão.",
+      "habilidade_inata": {
+        "nome": "Intervir",
+        "descricao": "Uma vez por cena, ganha um turno adicional no começo da iniciativa. Nesse turno extra, recebe +1D6 de dano em seus ataques.",
+        "custo": "1x por cena"
+      },
+      "formulas": {
+        "vida": {
+          "inicial": "12 + vit_max",
+          "por_nivel": "4 + vit_half",
+          "base_inicial": 12,
+          "base_nivel": 4,
+          "atributo": "vitalidade"
+        },
+        "sanidade": {
+          "inicial": "8 + int_max",
+          "por_nivel": "2 + int_half",
+          "base_inicial": 8,
+          "base_nivel": 2,
+          "atributo": "inteligencia"
+        }
+      }
+    },
+    {
+      "id": "idealizador",
+      "nome": "Idealizador",
+      "perfil": "Estrategista focado em aprender com os erros e planejar ações.",
+      "habilidade_inata": {
+        "nome": "Estoque",
+        "descricao": "A cada falha em testes, pode acumular 1D6 para usar em rolagens futuras, com um máximo de 4 acúmulos.",
+        "custo": "Passivo / Reativo (máx 4D6)"
+      },
+      "formulas": {
+        "vida": {
+          "inicial": "8 + vit_max",
+          "por_nivel": "2 + vit_half",
+          "base_inicial": 8,
+          "base_nivel": 2,
+          "atributo": "vitalidade"
+        },
+        "sanidade": {
+          "inicial": "12 + int_max",
+          "por_nivel": "4 + int_half",
+          "base_inicial": 12,
+          "base_nivel": 4,
+          "atributo": "inteligencia"
+        }
+      }
+    },
+    {
+      "id": "pilar",
+      "nome": "Pilar",
+      "perfil": "Protetor altruísta focado em fortalecer e sustentar seus aliados.",
+      "habilidade_inata": {
+        "nome": "Vínculo",
+        "descricao": "Se um aliado gastar 1 ponto de Akasha para usar seu Grau de Desenvolvimento ou Conhecimento, aumenta o dado compartilhado em 1 passo. Limitado a um personagem por cena.",
+        "custo": "Passivo / 1 aliado por cena"
+      },
+      "formulas": {
+        "vida": {
+          "inicial": "10 + vit_max",
+          "por_nivel": "3 + vit_half",
+          "base_inicial": 10,
+          "base_nivel": 3,
+          "atributo": "vitalidade"
+        },
+        "sanidade": {
+          "inicial": "10 + int_max",
+          "por_nivel": "3 + int_half",
+          "base_inicial": 10,
+          "base_nivel": 3,
+          "atributo": "inteligencia"
+        }
+      }
+    },
+    {
+      "id": "apostador",
+      "nome": "Apostador",
+      "perfil": "Oportunista audacioso focado em brincar com a sorte e dobrar as probabilidades.",
+      "habilidade_inata": {
+        "nome": "Roleta",
+        "descricao": "Uma vez por cena, pode converter 1 Dado do Caos rolado de Karma para Mantra ou vice-versa, mantendo o mesmo resultado numérico que caiu na face do D8.",
+        "custo": "1x por cena"
+      },
+      "formulas": {
+        "vida": {
+          "inicial": "8 + vit_max",
+          "por_nivel": "2 + vit_half",
+          "base_inicial": 8,
+          "base_nivel": 2,
+          "atributo": "vitalidade"
+        },
+        "sanidade": {
+          "inicial": "8 + int_max",
+          "por_nivel": "2 + int_half",
+          "base_inicial": 8,
+          "base_nivel": 2,
+          "atributo": "inteligencia"
+        }
+      }
+    },
+    {
+      "id": "versado",
+      "nome": "Versado",
+      "perfil": "Erudito místico e pesquisador focado em versatilidade cósmica e companheiros familiares.",
+      "habilidade_inata": {
+        "nome": "Companhia",
+        "descricao": "Começa o jogo com um Servo Estável já criado, podendo convocá-lo para a cena como uma ação livre.",
+        "custo": "Ação Livre"
+      },
+      "formulas": {
+        "vida": {
+          "inicial": "10 + vit_max",
+          "por_nivel": "3 + vit_half",
+          "base_inicial": 10,
+          "base_nivel": 3,
+          "atributo": "vitalidade"
+        },
+        "sanidade": {
+          "inicial": "10 + int_max",
+          "por_nivel": "3 + int_half",
+          "base_inicial": 10,
+          "base_nivel": 3,
+          "atributo": "inteligencia"
+        }
+      }
+    }
+  ],
+  "elementos": {
+    "base": [
+      "Fogo",
+      "Água",
+      "Ar",
+      "Terra",
+      "Éter"
+    ],
+    "fusoes_catalogadas": [
+      {
+        "elemento_1": "Ar",
+        "elemento_2": "Éter",
+        "fusao": "Ilusão",
+        "deus": "Loki"
+      },
+      {
+        "elemento_1": "Terra",
+        "elemento_2": "Água",
+        "fusao": "Natureza",
+        "deus": "Freya"
+      },
+      {
+        "elemento_1": "Fogo",
+        "elemento_2": "Ar",
+        "fusao": "Raio",
+        "deus": "Thor"
+      },
+      {
+        "elemento_1": "Fogo",
+        "elemento_2": "Terra",
+        "fusao": "Alma",
+        "deus": "Hela"
+      },
+      {
+        "elemento_1": "Ar",
+        "elemento_2": "Terra",
+        "fusao": "Areia",
+        "deus": "Seth"
+      },
+      {
+        "elemento_1": "Éter",
+        "elemento_2": "Terra",
+        "fusao": "Cinzas",
+        "deus": "Anúbis"
+      },
+      {
+        "elemento_1": "Éter",
+        "elemento_2": "Fogo",
+        "fusao": "Sol",
+        "deus": "Rá"
+      },
+      {
+        "elemento_1": "Fogo",
+        "elemento_2": "Éter",
+        "fusao": "Luz",
+        "deus": "Apolo",
+        "nota": "Divergência Elemental de Rá"
+      },
+      {
+        "elemento_1": "Terra",
+        "elemento_2": "Fogo",
+        "fusao": "Metal",
+        "deus": "Ares"
+      },
+      {
+        "elemento_1": "Éter",
+        "elemento_2": "Ar",
+        "fusao": "Sabedoria",
+        "deus": "Athena"
+      },
+      {
+        "elemento_1": "Terra",
+        "elemento_2": "Ar",
+        "fusao": "Lua",
+        "deus": "Tsukuyomi"
+      },
+      {
+        "elemento_1": "Água",
+        "elemento_2": "Ar",
+        "fusao": "Tempestade",
+        "deus": "Susanoo"
+      },
+      {
+        "elemento_1": "Éter",
+        "elemento_2": "Água",
+        "fusao": "Misericórdia",
+        "deus": "Kannon"
+      }
+    ]
+  },
+  "mitologias": [
+    {
+      "id": "nordica",
+      "nome": "Mitologia Nórdica",
+      "caminhos": [
+        {
+          "id": "loki",
+          "deus": "Loki",
+          "titulo": "Caminho da Trapaça",
+          "elementos": {
+            "elemento_1": "Ar",
+            "elemento_2": "Éter",
+            "elemento_3": "Ilusão"
+          },
+          "habilidades": [
+            {
+              "nivel": 2,
+              "nome": "Trollei",
+              "descricao": "Como reação ao levar um ataque, pode substituir seu corpo por uma réplica e aparecer em outro espaço livre em um raio de até 6 metros.",
+              "custo": "Reação"
+            },
+            {
+              "nivel": 5,
+              "nome": "Transformar",
+              "descricao": "Muda sua aparência e aspectos biológicos para um ser que já tenha visto, tornando-se outra pessoa e aumentando em 1 passo o seu dado de Social enquanto transformado.",
+              "custo": "1 Ação"
+            },
+            {
+              "nivel": 8,
+              "nome": "Manipular",
+              "descricao": "Implanta memórias falsas em um ser. O alvo deve passar em um teste de Mente contra o seu Social para não acreditar fielmente no que você implantou.",
+              "custo": "1 Ação"
+            },
+            {
+              "nivel": 8,
+              "nome": "Ilusão",
+              "descricao": "Cria ilusões complexas intangíveis baseadas nas limitações do nível pessoal. Aumenta em 1 passo o dado da perícia para a qual a ilusão foi projetada.",
+              "custo": "1 Ação"
+            }
+          ]
+        },
+        {
+          "id": "freya",
+          "deus": "Freya",
+          "titulo": "Caminho da Natureza",
+          "elementos": {
+            "elemento_1": "Terra",
+            "elemento_2": "Água",
+            "elemento_3": "Natureza"
+          },
+          "habilidades": [
+            {
+              "nivel": 2,
+              "nome": "Restaurar",
+              "descricao": "Cria borboletas douradas que curam aliados com base no seu Dado Alto. Pode curar até 2 aliados por rodada.",
+              "custo": "1 Ação (até 2 alvos)"
+            },
+            {
+              "nivel": 5,
+              "nome": "Ai Meu Pé",
+              "descricao": "Cria vinhas com espinhos no chão que reduzem o movimento dos inimigos em 2 metros, diminuem a Destreza do alvo em 1 passo e causam 1D6 de dano toda vez que ele se move.",
+              "custo": "1 Ação"
+            },
+            {
+              "nivel": 8,
+              "nome": "Berço de Flores",
+              "descricao": "Convoca uma área florida que ocupa um raio de 3 metros. Aliados dentro da área são curados com base em seu Dado Alto a cada rodada.",
+              "custo": "1 Ação (Sustentado)"
+            },
+            {
+              "nivel": 8,
+              "nome": "Semente da Vontade",
+              "descricao": "Conjura um servo temporário em forma de semente que parasita o inimigo, absorvendo vida com base no Dado Alto do teste de Mente. A cada 15/25/35 de vida absorvida (broto, botão e flor), evolui aumentando o dano do usuário em +1D4.",
+              "custo": "1 Ação"
+            }
+          ]
+        },
+        {
+          "id": "thor",
+          "deus": "Thor",
+          "titulo": "Caminho da Proteção",
+          "elementos": {
+            "elemento_1": "Fogo",
+            "elemento_2": "Ar",
+            "elemento_3": "Raio"
+          },
+          "habilidades": [
+            {
+              "nivel": 2,
+              "nome": "Reposicionar",
+              "descricao": "Transforma-se brevemente em raio e se coloca na frente de um ataque que um aliado receberia, podendo defendê-lo.",
+              "custo": "Reação"
+            },
+            {
+              "nivel": 5,
+              "nome": "Corpo Estático",
+              "descricao": "Cria uma aura elétrica ao redor do corpo, aumentando a sua Resistência em 1 passo. A duração é de uma cena inteira.",
+              "custo": "1 Ação (Dura 1 cena)"
+            },
+            {
+              "nivel": 8,
+              "nome": "Querida, eu trouxe proteção",
+              "descricao": "Permite que todos os aliados adjacentes aumentem sua Destreza ou Resistência em 1 passo.",
+              "custo": "Ação Livre / Suporte"
+            },
+            {
+              "nivel": 8,
+              "nome": "Arma Vinculada",
+              "descricao": "Magnetiza uma arma pessoal que só pode ser empunhada por você (outros devem passar em Resistência DT triplo da sua Resistência). Pode ser arremessada e chamada de volta causando dano como segundo ataque. Dura uma cena de combate.",
+              "custo": "1 Ação (Dura 1 cena)"
+            }
+          ]
+        },
+        {
+          "id": "hela",
+          "deus": "Hela",
+          "titulo": "Caminho da Alma",
+          "elementos": {
+            "elemento_1": "Fogo",
+            "elemento_2": "Terra",
+            "elemento_3": "Alma"
+          },
+          "habilidades": [
+            {
+              "nivel": 2,
+              "nome": "Absorver",
+              "descricao": "O próximo ataque acertado recupera metade de todo o dano causado em Pontos de Vida para o personagem.",
+              "custo": "Ação Bônus"
+            },
+            {
+              "nivel": 5,
+              "nome": "Intimidação Fúnebre",
+              "descricao": "Quando for intimidar uma pessoa em cena, seu dado de Social aumenta em 1 passo.",
+              "custo": "Passivo / Interação"
+            },
+            {
+              "nivel": 8,
+              "nome": "Coleta de Essências",
+              "descricao": "A cada oponente morto, a essência do mesmo é coletada (máximo de 3 essências acumuladas). Cada essência concede +2 de dano em ataques futuros.",
+              "custo": "Passivo (máx 3 essências)"
+            },
+            {
+              "nivel": 8,
+              "nome": "Quando o relógio bate a uma",
+              "descricao": "Permite gastar 1 essência coletada para erguer dos mortos o mesmo ser, que atacará junto do personagem e viverá até o fim da cena (máximo 1 ser revivido por vez).",
+              "custo": "1 Essência"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "egipcia",
+      "nome": "Mitologia Egípcia",
+      "caminhos": [
+        {
+          "id": "seth",
+          "deus": "Seth",
+          "titulo": "Caminho do Deserto",
+          "elementos": {
+            "elemento_1": "Ar",
+            "elemento_2": "Terra",
+            "elemento_3": "Areia"
+          },
+          "habilidades": [
+            {
+              "nivel": 2,
+              "nome": "Barragem",
+              "descricao": "Permite criar uma barreira de areia que defende igual ao Dado Alto de Destreza; caso seja arremessada contra o inimigo, causa dano igual ao Dado Baixo de Destreza.",
+              "custo": "1 Ação ou Reação"
+            },
+            {
+              "nivel": 5,
+              "nome": "Imagina se pega na vista",
+              "descricao": "Cria uma tempestade de areia em um raio de 3 metros. Inimigos em seu interior ficam com a visão turva e sofrem redução de 1 passo em suas perícias de ataque.",
+              "custo": "1 Ação"
+            },
+            {
+              "nivel": 8,
+              "nome": "Oásis",
+              "descricao": "Cria um oásis com área de 3 metros. Aliados no interior do campo têm sua Destreza aumentada em 1 passo e seu deslocamento ampliado em +2 metros.",
+              "custo": "1 Ação (Dura 1 cena)"
+            },
+            {
+              "nivel": 8,
+              "nome": "Agulhas do Rei",
+              "descricao": "Convoca uma tempestade de agulhas de areia. Ao atingir o oponente, inflige 2 vezes o Dado Alto de dano e aplica a condição Sangrando.",
+              "custo": "1 Ação Completa"
+            }
+          ]
+        },
+        {
+          "id": "anubis",
+          "deus": "Anúbis",
+          "titulo": "Caminho da Morte",
+          "elementos": {
+            "elemento_1": "Éter",
+            "elemento_2": "Terra",
+            "elemento_3": "Cinzas"
+          },
+          "habilidades": [
+            {
+              "nivel": 2,
+              "nome": "Sombra de Cinzas",
+              "descricao": "Cria uma silhueta de cinzas que o acompanha como sombra e repete toda a sua ação e dano, garantindo um ataque extra imediato.",
+              "custo": "1 Ação"
+            },
+            {
+              "nivel": 5,
+              "nome": "Força Mórbida",
+              "descricao": "Quando estiver com 4 pontos de vida ou menos, a sua perícia de ataque aumenta em 1 passo.",
+              "custo": "Passivo de Sobrevivência"
+            },
+            {
+              "nivel": 8,
+              "nome": "Zona Morta",
+              "descricao": "Cria uma área de cinzas de 3 metros de raio que causa dano em todos os seres hostis em seu interior igual à metade do Dado Alto da perícia de ataque.",
+              "custo": "1 Ação (Sustentado)"
+            },
+            {
+              "nivel": 8,
+              "nome": "Morri!",
+              "descricao": "Quando seus pontos de vida chegarem a 0, retorna automaticamente com 4 pontos de vida e, nesse mesmo turno, ganha uma Sombra de Cinzas gratuitamente.",
+              "custo": "Reação Automática"
+            }
+          ]
+        },
+        {
+          "id": "ra",
+          "deus": "Rá",
+          "titulo": "Caminho do Sol",
+          "elementos": {
+            "elemento_1": "Éter",
+            "elemento_2": "Fogo",
+            "elemento_3": "Sol"
+          },
+          "habilidades": [
+            {
+              "nivel": 2,
+              "nome": "Filho do Sol",
+              "descricao": "Se estiver banhado pela luz solar, seu corpo enche-se de vigor, aumentando sua vida atual em valor igual ao dobro da sua vida máxima (apenas utilizável durante o dia).",
+              "custo": "1 Ação (Dia)"
+            },
+            {
+              "nivel": 5,
+              "nome": "Tá pegando fogo, bicho!",
+              "descricao": "Seus punhos ou armas entram em combustão radiante, aumentando a perícia de ataque em 1 passo (apenas utilizável durante o dia).",
+              "custo": "Ação Bônus (Dia)"
+            },
+            {
+              "nivel": 8,
+              "nome": "Irradiar",
+              "descricao": "Cria uma aura ao redor do corpo: aliados adjacentes recebem metade da sua vida máxima como cura imediata de vida atual (apenas de dia).",
+              "custo": "1 Ação (Dia)"
+            },
+            {
+              "nivel": 8,
+              "nome": "O Sol",
+              "descricao": "Conjura um sol artificial que causa dano igual ao dobro do Dado Alto de ataque. Caso seja usado à noite, quebra a restrição e permite usar todas as outras habilidades no horário atual.",
+              "custo": "1 Ação Completa"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "grega",
+      "nome": "Mitologia Grega",
+      "caminhos": [
+        {
+          "id": "apolo",
+          "deus": "Apolo",
+          "titulo": "Caminho da Luz",
+          "elementos": {
+            "elemento_1": "Fogo",
+            "elemento_2": "Éter",
+            "elemento_3": "Luz"
+          },
+          "habilidades": [
+            {
+              "nivel": 2,
+              "nome": "Flashbang!",
+              "descricao": "Cria uma explosão luminosa ofuscante que paralisa completamente o oponente por 1 rodada inteira.",
+              "custo": "1 Ação"
+            },
+            {
+              "nivel": 5,
+              "nome": "Estrela Cadente",
+              "descricao": "Aumenta a sua Destreza em 1 passo e, ao acertar um ataque, reduz a perícia de Sentidos do oponente em 1 passo.",
+              "custo": "Passivo / No Ataque"
+            },
+            {
+              "nivel": 8,
+              "nome": "Refração",
+              "descricao": "Manipula a luz ambiente ao redor do corpo para ficar invisível por 1 turno (detectável apenas por percepção mágica).",
+              "custo": "1 Ação"
+            },
+            {
+              "nivel": 8,
+              "nome": "Super Nova",
+              "descricao": "Canaliza poder por uma rodada completa e explode em radiação estelar, causando o dobro do Dado de Ataque como dano em área.",
+              "custo": "1 Rodada de Canalização"
+            }
+          ]
+        },
+        {
+          "id": "ares",
+          "deus": "Ares",
+          "titulo": "Caminho da Guerra",
+          "elementos": {
+            "elemento_1": "Terra",
+            "elemento_2": "Fogo",
+            "elemento_3": "Metal"
+          },
+          "habilidades": [
+            {
+              "nivel": 2,
+              "nome": "Pega na minha espada",
+              "descricao": "Pode criar instantaneamente até 4 armas à sua escolha. Cada arma forjada causa +1D6 de dano adicional.",
+              "custo": "1 Ação"
+            },
+            {
+              "nivel": 5,
+              "nome": "Sentidos Aguçados",
+              "descricao": "Quando em combate, pode utilizar a perícia Sentidos combinada com Destreza, recebendo um aumento de 1 passo na rolagem.",
+              "custo": "Passivo de Combate"
+            },
+            {
+              "nivel": 8,
+              "nome": "Grito Inspirador",
+              "descricao": "Solta um brado de guerra que remove todos os debuffs e condições adversas de si e de seus aliados em um raio de 3 metros.",
+              "custo": "1 Ação"
+            },
+            {
+              "nivel": 8,
+              "nome": "Chama Incontrolável",
+              "descricao": "Ao chegar a 0 de Vida, continua de pé lutando: ganha +1 passo no dado de ataque e suas armas causam dano baseado no Dado Alto, perdendo 2 pontos de Sanidade por rodada.",
+              "custo": "Passivo ao cair a 0 PV (custa 2 Sanidade/rodada)"
+            }
+          ]
+        },
+        {
+          "id": "athena",
+          "deus": "Athena",
+          "titulo": "Caminho do Conhecimento",
+          "elementos": {
+            "elemento_1": "Éter",
+            "elemento_2": "Ar",
+            "elemento_3": "Sabedoria"
+          },
+          "habilidades": [
+            {
+              "nivel": 2,
+              "nome": "Coruja de Espionagem",
+              "descricao": "Em cenas de investigação, conjura um servo coruja etéreo que voa até o ponto de interesse e recolhe a informação sem teste.",
+              "custo": "1 Ação em Investigação"
+            },
+            {
+              "nivel": 5,
+              "nome": "Discernimento Tático",
+              "descricao": "Permite aumentar em 1 passo qualquer perícia à sua escolha.",
+              "custo": "Ação Livre (Dura 1 cena)"
+            },
+            {
+              "nivel": 8,
+              "nome": "Comando da Coruja",
+              "descricao": "Lê o combate e comanda seu servo coruja para conceder a um aliado a escolha entre +1 passo em uma perícia ou 1 ação adicional imediata.",
+              "custo": "1 Ação"
+            },
+            {
+              "nivel": 8,
+              "nome": "Ápice da Sabedoria",
+              "descricao": "Aplica todo o seu conhecimento para elevar todas as suas perícias em 1 passo e dobrar o dano de seus ataques.",
+              "custo": "1 Ação Completa"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "japonesa",
+      "nome": "Mitologia Japonesa",
+      "caminhos": [
+        {
+          "id": "tsukuyomi",
+          "deus": "Tsukuyomi",
+          "titulo": "Caminho da Lua",
+          "elementos": {
+            "elemento_1": "Terra",
+            "elemento_2": "Ar",
+            "elemento_3": "Lua"
+          },
+          "habilidades": [
+            {
+              "nivel": 2,
+              "nome": "Seguidor da Lua",
+              "descricao": "Se estiver em ambiente escuro, noturno ou pouco iluminado, recebe um bônus constante de +1D6 em todas as ações.",
+              "custo": "Passivo (Condicional à escuridão)"
+            },
+            {
+              "nivel": 5,
+              "nome": "Brilha, brilha, estrelinha",
+              "descricao": "Cria uma névoa com estrelas que induz torpor no oponente, diminuindo seu dado de ataque em 1 passo.",
+              "custo": "1 Ação"
+            },
+            {
+              "nivel": 8,
+              "nome": "Visão Espiritual",
+              "descricao": "Conexão com o mundo espiritual que revela os pontos fracos do inimigo, aplicando bônus especial no dado de ataque a critério do mestre.",
+              "custo": "Ação Bônus"
+            },
+            {
+              "nivel": 8,
+              "nome": "Lua Obscura",
+              "descricao": "Cria uma pequena lua que absorve a iluminação ambiente e projeta um campo redutor de dificuldade para todos os testes dos aliados na área.",
+              "custo": "1 Ação"
+            }
+          ]
+        },
+        {
+          "id": "susanoo",
+          "deus": "Susanoo",
+          "titulo": "Caminho da Tempestade",
+          "elementos": {
+            "elemento_1": "Água",
+            "elemento_2": "Ar",
+            "elemento_3": "Tempestade"
+          },
+          "habilidades": [
+            {
+              "nivel": 2,
+              "nome": "Passando mais uma marcha",
+              "descricao": "Move-se em velocidade sobre-humana, recebendo 1 ação bônus livre em combate.",
+              "custo": "1x por combate"
+            },
+            {
+              "nivel": 5,
+              "nome": "Precipitar das Almas",
+              "descricao": "Chuva suave que purifica o ar e aumenta a velocidade do usuário, elevando seu dado de Destreza em 1 passo.",
+              "custo": "1 Ação (Dura 1 cena)"
+            },
+            {
+              "nivel": 8,
+              "nome": "Chuva de Lâminas",
+              "descricao": "Dispara lâminas elétricas em uma área de 6 metros, infligindo dano e aplicando a condição Eletrocutado (1D6 de dano por turno).",
+              "custo": "1 Ação"
+            },
+            {
+              "nivel": 8,
+              "nome": "Descarregar",
+              "descricao": "Gasta uma ação completa para canalizar energia elétrica e, no próximo turno, descarrega um raio colossal que causa dano em área e deixa os alvos imobilizados e eletrocutados.",
+              "custo": "1 Ação Completa + Turno Seguinte"
+            }
+          ]
+        },
+        {
+          "id": "kannon",
+          "deus": "Kannon",
+          "titulo": "Caminho da Misericórdia",
+          "elementos": {
+            "elemento_1": "Éter",
+            "elemento_2": "Água",
+            "elemento_3": "Misericórdia"
+          },
+          "habilidades": [
+            {
+              "nivel": 2,
+              "nome": "Alívio do Sofrimento",
+              "descricao": "Usa água pura para lavar ferimentos de um aliado, restaurando pontos de vida e recuperando 1 ponto de Sanidade (Equilíbrio).",
+              "custo": "1 Ação"
+            },
+            {
+              "nivel": 5,
+              "nome": "Ouvir Clamor",
+              "descricao": "Quando um aliado sofre dano ou manifesta dor na presença do usuário, cria uma área sagrada que fortalece os aliados e aumenta os dados de defesa de quem estiver no alcance.",
+              "custo": "Reação"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "nivel_de_mao": {
+    "maximo_niveis_total": 5,
+    "maximo_niveis_playtest": 2,
+    "maos": {
+      "terminus": {
+        "nome": "Terminus",
+        "polaridade": "Mão Esquerda (-)",
+        "foco": "Karma e Caos",
+        "niveis": [
+          {
+            "nivel": 1,
+            "dedo": "Polegar",
+            "efeito": "Aumento de Desenvolvimento (+1 passo em atributo/perícia). Quando rodar um Karma, o resultado na tabela sempre será 1 a menos do que o número rolado.",
+            "bloqueia": "Gênesis V"
+          },
+          {
+            "nivel": 2,
+            "dedo": "Indicador",
+            "efeito": "Uma vez por cena, um resultado negativo na mesa gera o efeito oposto (positivo). Efeito colateral: O número 8 do Mantra passa a ter efeito negativo.",
+            "bloqueia": "Gênesis IV"
+          },
+          {
+            "nivel": 3,
+            "dedo": "Médio",
+            "efeito": "Nível avançado (livro completo).",
+            "bloqueia": "Gênesis III"
+          },
+          {
+            "nivel": 4,
+            "dedo": "Anelar",
+            "efeito": "Nível avançado (livro completo).",
+            "bloqueia": "Gênesis II"
+          },
+          {
+            "nivel": 5,
+            "dedo": "Mínimo",
+            "efeito": "Nível supremo do Caos (livro completo).",
+            "bloqueia": "Gênesis I"
+          }
+        ]
+      },
+      "genesis": {
+        "nome": "Gênesis",
+        "polaridade": "Mão Direita (+)",
+        "foco": "Mantra e Ordem",
+        "niveis": [
+          {
+            "nivel": 1,
+            "dedo": "Polegar",
+            "efeito": "Aumento de Desenvolvimento (+1 passo em atributo/perícia). Quando rodar um Mantra, o resultado na tabela sempre será 1 a mais do que o número rolado.",
+            "bloqueia": "Terminus V"
+          },
+          {
+            "nivel": 2,
+            "dedo": "Indicador",
+            "efeito": "Uma vez por cena, pode rerrolar um dado de Mantra. Efeito colateral: O número 8 do Karma tem efeito dobrado.",
+            "bloqueia": "Terminus IV"
+          },
+          {
+            "nivel": 3,
+            "dedo": "Médio",
+            "efeito": "Nível avançado (livro completo).",
+            "bloqueia": "Terminus III"
+          },
+          {
+            "nivel": 4,
+            "dedo": "Anelar",
+            "efeito": "Nível avançado (livro completo).",
+            "bloqueia": "Terminus II"
+          },
+          {
+            "nivel": 5,
+            "dedo": "Mínimo",
+            "efeito": "Nível supremo da Ordem (livro completo).",
+            "bloqueia": "Terminus I"
+          }
+        ]
+      }
+    }
+  },
+  "fragmentos_de_runa": {
+    "regras_equipamento": "Um personagem pode equipar no máximo 1 runa de cada categoria simultaneamente (máx. 3 runas equipadas no total: 1 Corpo, 1 Mente, 1 Alma).",
+    "categorias": [
+      "Corpo",
+      "Mente",
+      "Alma"
+    ],
+    "runas": [
+      {
+        "id": "cweorth",
+        "nome": "Cweorth",
+        "elemento": "Fogo",
+        "categoria": "Corpo",
+        "efeito": "+1D4 de Dano em todos os ataques."
+      },
+      {
+        "id": "kaunan",
+        "nome": "Kaunan",
+        "elemento": "Fogo",
+        "categoria": "Mente",
+        "efeito": "Aumenta a perícia Mente em 1 passo."
+      },
+      {
+        "id": "liwaen",
+        "nome": "Liwaen",
+        "elemento": "Fogo",
+        "categoria": "Alma",
+        "efeito": "Ao rodar um dado de Karma, o oponente também é afetado pelo efeito."
+      },
+      {
+        "id": "isa",
+        "nome": "Isa",
+        "elemento": "Água",
+        "categoria": "Corpo",
+        "efeito": "+1D4 na rolagem de Esquiva."
+      },
+      {
+        "id": "thurisaz",
+        "nome": "Thurisaz",
+        "elemento": "Água",
+        "categoria": "Mente",
+        "efeito": "+1D4 em testes de Investigação."
+      },
+      {
+        "id": "kaegos",
+        "nome": "Kaegos",
+        "elemento": "Água",
+        "categoria": "Alma",
+        "efeito": "O bônus concedido pelo gasto de Akasha dura duas cenas consecutivas."
+      },
+      {
+        "id": "ehwaz",
+        "nome": "Ehwaz",
+        "elemento": "Ar",
+        "categoria": "Corpo",
+        "efeito": "Garante 1 ataque adicional por rodada."
+      },
+      {
+        "id": "eihwaz",
+        "nome": "Eihwaz",
+        "elemento": "Ar",
+        "categoria": "Mente",
+        "efeito": "Permite investigar dois locais diferentes de uma só vez utilizando um único resultado."
+      },
+      {
+        "id": "abanen",
+        "nome": "Abanen",
+        "elemento": "Ar",
+        "categoria": "Alma",
+        "efeito": "Ao término de uma cena, recupera 1 ponto de Akasha até o limite máximo."
+      },
+      {
+        "id": "heiwaz",
+        "nome": "Heiwaz",
+        "elemento": "Terra",
+        "categoria": "Corpo",
+        "efeito": "+10 Pontos de Vida Máxima."
+      },
+      {
+        "id": "algiz",
+        "nome": "Algiz",
+        "elemento": "Terra",
+        "categoria": "Mente",
+        "efeito": "+10 Pontos de Sanidade (Equilíbrio) Máxima."
+      },
+      {
+        "id": "thaan",
+        "nome": "Thaan",
+        "elemento": "Terra",
+        "categoria": "Alma",
+        "efeito": "+2 Pontos de Akasha na reserva máxima."
+      },
+      {
+        "id": "ac",
+        "nome": "Ac",
+        "elemento": "Éter",
+        "categoria": "Corpo",
+        "efeito": "Pode gastar 1 Ponto de Caos para aplicar a soma máxima das faces dos dados de dano."
+      },
+      {
+        "id": "dagaz",
+        "nome": "Dagaz",
+        "elemento": "Éter",
+        "categoria": "Mente",
+        "efeito": "Uma vez por cena, pode usar o resultado do teste de um aliado em sua própria ação."
+      },
+      {
+        "id": "dakani",
+        "nome": "Dakani",
+        "elemento": "Éter",
+        "categoria": "Alma",
+        "efeito": "Concede +1 Ponto de Caos extra permanente."
+      }
+    ]
+  },
+  "dados_do_caos": {
+    "dado_utilizado": "D8",
+    "gatilhos": {
+      "sucesso_critico": "Dados iguais com faces de valor 6 ou maior -> Rola 1D8 na Tabela de Mantra",
+      "falha_critica": "Dados iguais com faces de valor 5 ou menor -> Rola 1D8 na Tabela de Karma",
+      "evento_caotico_mantrico": "A soma total dos dados é exatamente igual a 8 E o personagem passa no teste -> Rola 1D8 na Tabela de Mantra",
+      "evento_caotico_karmico": "A soma total dos dados é exatamente igual a 8 E o personagem falha no teste -> Rola 1D8 na Tabela de Karma"
+    },
+    "karma_atual": {
+      "Positivo": "Todo Dado do Caos que surgir na cena converte-se automaticamente em Mantra.",
+      "Neutro": "Os Dados do Caos funcionam conforme a regra e gatilho originais.",
+      "Negativo": "Todo Dado do Caos que surgir na cena converte-se automaticamente em Karma."
+    },
+    "aposta_com_o_caos": {
+      "recurso": "Ponto de Caos (Inicia com 1)",
+      "mecanica": "Rola 8D8 do Jogador contra 8D8 do Mestre",
+      "sucesso": "O desejo do jogador se realiza plenamente no universo.",
+      "fracasso": "O jogador perde 8 pontos de Sanidade e rola 1 Karma imediato.",
+      "recuperacao": "Apenas ao concluir a missão."
+    },
+    "tabelas": {
+      "mantra": {
+        "tabela_1": {
+          "1": "Todos os aliados recebem +2 pontos de Akasha.",
+          "2": "A pessoa recebe uma ação adicional imediata.",
+          "3": "Recupera 1D8 de Pontos de Vida.",
+          "4": "O próximo ataque elemental causa o dobro de dano.",
+          "5": "A próxima Habilidade de Caminho (HC) não tem custo.",
+          "6": "Cria um atalho no espaço-tempo para um local conhecido.",
+          "7": "Os próximos 3 testes rodam com 1 passo acima.",
+          "8": "O mestre realiza uma mudança benigna e condizente na cena."
+        },
+        "tabela_2": {
+          "1": "Aumenta uma perícia à escolha em 1 passo por uma cena.",
+          "2": "Aumenta um atributo à escolha em 1 passo por uma cena.",
+          "3": "Remove o efeito negativo de um Limiar ativo.",
+          "4": "Pode usar um ponto de Akasha sem custo.",
+          "5": "Recupera 1D8 de Sanidade (Equilíbrio).",
+          "6": "Recebe uma Moeda da Sorte (sucesso automático no próximo teste fora de combate).",
+          "7": "Ganha um Servo que auxilia o grupo durante toda a cena.",
+          "8": "Ganha +1 Ponto de Caos permanente."
+        }
+      },
+      "karma": {
+        "tabela_1": {
+          "1": "Todos os aliados perdem -2 pontos de Akasha.",
+          "2": "A pessoa fica atordoada e não pode agir nesta rodada.",
+          "3": "Perde 1D8 de Pontos de Vida.",
+          "4": "O próximo ataque elemental ricocheteia e atinge o usuário.",
+          "5": "A próxima Habilidade de Caminho tem seu custo dobrado.",
+          "6": "Cai em um portal dimensional e fica uma rodada desaparecido.",
+          "7": "Os próximos 3 testes rodam com 1 passo abaixo.",
+          "8": "O próximo crítico obtido por qualquer jogador torna-se um desastre."
+        },
+        "tabela_2": {
+          "1": "Diminui uma perícia em um passo até o fim da cena.",
+          "2": "Diminui um atributo em um passo até o fim da cena.",
+          "3": "Não pode ser curado do efeito negativo de limiar.",
+          "4": "O próximo gasto de Akasha tem custo dobrado.",
+          "5": "Perde 1D8 de Sanidade (Equilíbrio).",
+          "6": "Recebe uma Moeda do Azar (falha automática no próximo teste fora de combate).",
+          "7": "Um Demonomicron aparece imediatamente no combate.",
+          "8": "Perde 1 Ponto de Caos de sua reserva."
+        }
+      }
+    }
+  },
+  "progressao_nivel_pessoal": {
+    "niveis": [
+      {
+        "nivel": 1,
+        "beneficios": [
+          "Escolha de Atuação",
+          "Habilidade de Atuação Inicial",
+          "2 Pontos de Akasha",
+          "1 Ponto de Caos"
+        ]
+      },
+      {
+        "nivel": 2,
+        "beneficios": [
+          "Escolha de Caminho",
+          "Habilidade de Caminho Nv 2",
+          "+1 Ponto de Akasha"
+        ]
+      },
+      {
+        "nivel": 3,
+        "beneficios": [
+          "Habilidade de Atuação Adicional",
+          "+1 Ponto de Akasha (regra níveis ímpares)"
+        ]
+      },
+      {
+        "nivel": 4,
+        "beneficios": [
+          "+1 Nível de Mão (Terminus I ou Gênesis I)",
+          "+1 Ponto de Akasha"
+        ]
+      },
+      {
+        "nivel": 5,
+        "beneficios": [
+          "Habilidade de Caminho Nv 5",
+          "+1 Grau de Conhecimento (+1 passo em perícia)",
+          "+1 Ponto de Akasha (regra níveis ímpares)"
+        ]
+      },
+      {
+        "nivel": 6,
+        "beneficios": [
+          "Habilidade de Atuação Adicional",
+          "+1 Ponto de Akasha"
+        ]
+      },
+      {
+        "nivel": 7,
+        "beneficios": [
+          "Desbloqueio de Fragmento de Runa",
+          "+1 Ponto de Akasha (regra níveis ímpares)"
+        ]
+      },
+      {
+        "nivel": 8,
+        "beneficios": [
+          "+1 Nível de Mão (segundo nível)",
+          "2 Habilidades de Caminho Nv 8",
+          "+1 Ponto de Akasha"
+        ]
+      }
+    ],
+    "tabela_experiencia_xp": [
+      {
+        "acao": "Interagir com NPC",
+        "xp": 5
+      },
+      {
+        "acao": "Investigar",
+        "xp": 5
+      },
+      {
+        "acao": "Participar de Batalha",
+        "xp": 5
+      },
+      {
+        "acao": "Descobrir Informação",
+        "xp": 10
+      },
+      {
+        "acao": "Achar Pista",
+        "xp": 10
+      },
+      {
+        "acao": "Derrotar Criatura Caótica",
+        "xp": 10
+      },
+      {
+        "acao": "Ajudar Aliado",
+        "xp": 10
+      },
+      {
+        "acao": "Interpretação Destacada",
+        "xp": 100
+      },
+      {
+        "acao": "Concluir Missão",
+        "xp": 200
+      }
+    ]
+  },
+  "inventario": {
+    "categorias_itens": [
+      {
+        "tipo": "Arma",
+        "efeito": "Aumenta a perícia de ataque em +1 passo e adiciona +1 ao dano.",
+        "peso_min": 1,
+        "peso_max": 4
+      },
+      {
+        "tipo": "Item Suporte",
+        "efeito": "Concede bônus fixo de +5 em Vida Máxima, +5 em Sanidade Máxima ou +1D4 de dano.",
+        "peso": 1
+      },
+      {
+        "tipo": "Documentos",
+        "efeito": "Itens narrativos para investigação de casos.",
+        "peso": 0,
+        "custo": 0
+      },
+      {
+        "tipo": "Besteirol",
+        "efeito": "Itens puramente estéticos, souvenirs e itens de lore (skin).",
+        "peso": 0,
+        "custo": 0
+      }
+    ]
+  }
+}
