@@ -154,44 +154,82 @@ export default function DiceRollerDrawer({
       karmaAtual: character?.karmaAtual || 'Neutro'
     });
 
-    // 2. Extrair todos os valores numéricos individuais dos dados rolados
+    // 1. Extrair todos os valores numéricos individuais dos dados rolados
     const rolledValues = (result.diceRolled || []).map(d => Number(d.value) || 0);
-    const danoCausado = rolledValues.length > 0
+    const rawDano = rolledValues.length > 0
       ? (damageType === 'alto' ? Math.max(...rolledValues) : Math.min(...rolledValues))
       : 0;
 
-    // 3. Redução automática da vida da criatura (para Jogador e Mestre, sem bloquear por Defesa)
+    const totalAtaque = Number(result.total) || 0;
+    const isTargetSelected = selectedTargetId && selectedTargetId !== 'none';
+
+    let acertou = null;
+    let statusAtaque = null;
+    let danoCausado = 0;
     let novaVidaCriatura = null;
     let monsterAlvoNome = null;
 
-    if (selectedTargetId && selectedTargetId !== 'none' && danoCausado > 0) {
+    if (isTargetSelected) {
+      let freshMonster = null;
       try {
-        const { data: currentMonster, error: fetchErr } = await supabase
+        const { data, error: fetchErr } = await supabase
           .from('campaign_monsters')
-          .select('id, nome, vida_atual, vida_max')
+          .select('id, nome, vida_atual, vida_max, defesa, ficha_data')
           .eq('id', selectedTargetId)
           .single();
 
         if (fetchErr) {
-          console.error("Erro ao buscar vida do monstro alvo:", fetchErr);
-        } else if (currentMonster) {
-          monsterAlvoNome = currentMonster.nome;
-          const vidaAtual = Number(currentMonster.vida_atual) ?? Number(currentMonster.vida_max) ?? 0;
-          novaVidaCriatura = Math.max(0, vidaAtual - danoCausado);
-
-          const { error: updateErr } = await supabase
-            .from('campaign_monsters')
-            .update({ vida_atual: novaVidaCriatura })
-            .eq('id', selectedTargetId);
-
-          if (updateErr) {
-            console.error("Erro ao atualizar vida da criatura no Supabase:", updateErr);
-            alert(`Erro ao descontar vida da criatura: ${updateErr.message}`);
-          }
+          console.error("Erro ao buscar dados do monstro alvo:", fetchErr);
+        } else {
+          freshMonster = data;
         }
       } catch (err) {
-        console.error("Erro inesperado ao aplicar dano ao monstro:", err);
+        console.error("Erro inesperado ao buscar monstro:", err);
       }
+
+      const monsterToEvaluate = freshMonster || targetMonster;
+
+      if (monsterToEvaluate) {
+        monsterAlvoNome = monsterToEvaluate.nome;
+        const rawDefesa = monsterToEvaluate.defesa ?? monsterToEvaluate.ficha_data?.defesa ?? monsterToEvaluate.ficha_data?.esquiva;
+        const defesaAlvo = Number(rawDefesa) || 0;
+
+        // Regra de Acerto vs. Erro comparando total do ataque com a Defesa
+        if (totalAtaque >= defesaAlvo) {
+          // ACERTOU!
+          acertou = true;
+          statusAtaque = 'ACERTOU!';
+          danoCausado = rawDano;
+
+          if (danoCausado > 0) {
+            try {
+              const vidaAtual = Number(monsterToEvaluate.vida_atual) ?? Number(monsterToEvaluate.vida_max) ?? 0;
+              novaVidaCriatura = Math.max(0, vidaAtual - danoCausado);
+
+              const { error: updateErr } = await supabase
+                .from('campaign_monsters')
+                .update({ vida_atual: novaVidaCriatura })
+                .eq('id', selectedTargetId);
+
+              if (updateErr) {
+                console.error("Erro ao atualizar vida da criatura no Supabase:", updateErr);
+                alert(`Erro ao descontar vida da criatura: ${updateErr.message}`);
+              }
+            } catch (err) {
+              console.error("Erro inesperado ao aplicar dano ao monstro:", err);
+            }
+          }
+        } else {
+          // ERROU! (Defesa não superada)
+          acertou = false;
+          statusAtaque = 'ERROU! (Defesa não superada)';
+          danoCausado = 0;
+          // NÃO executa nenhum .update() de vida no Supabase
+        }
+      }
+    } else {
+      // Nenhum alvo selecionado: calcula o dano potencial para exibição geral
+      danoCausado = rawDano;
     }
 
     if (result.hasSucessoCritico || result.chaosRoll?.type === 'mantra') {
@@ -203,7 +241,10 @@ export default function DiceRollerDrawer({
       isAttack: true,
       damageType, // 'alto' | 'baixo'
       danoCausado,
-      targetMonsterId: selectedTargetId !== 'none' ? selectedTargetId : null,
+      danoPotencial: rawDano,
+      acertou,
+      statusAtaque,
+      targetMonsterId: isTargetSelected ? selectedTargetId : null,
       targetMonsterName: monsterAlvoNome || targetMonster?.nome || null,
       novaVidaCriatura
     };
@@ -618,13 +659,37 @@ export default function DiceRollerDrawer({
 
                     {/* DESTAQUE DO DANO CAUSADO (QUANDO FOR ATAQUE) */}
                     {roll.isAttack && (
-                      <div className="mt-2 bg-gradient-to-r from-amber-950/60 to-red-950/60 border border-amber-500/50 rounded-xl p-2.5 space-y-1.5">
+                      <div className={`mt-2 rounded-xl p-2.5 space-y-2 border transition-all ${
+                        roll.acertou === false
+                          ? 'bg-gradient-to-r from-neutral-950 to-red-950/40 border-red-900/60'
+                          : 'bg-gradient-to-r from-amber-950/60 to-red-950/60 border-amber-500/50'
+                      }`}>
+                        {/* Status de Acerto / Erro quando há criatura alvo */}
+                        {roll.statusAtaque && (
+                          <div className="flex items-center justify-between pb-1.5 border-b border-white/10 text-xs">
+                            <span className="text-[11px] text-slate-400 font-cinzel">Status do Ataque:</span>
+                            {roll.acertou ? (
+                              <span className="font-cinzel font-bold text-emerald-400 flex items-center gap-1 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/50 shadow">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> ACERTOU!
+                              </span>
+                            ) : (
+                              <span className="font-cinzel font-bold text-red-400 flex items-center gap-1 bg-red-950/80 px-2 py-0.5 rounded border border-red-500/50 shadow">
+                                <XCircle className="w-3.5 h-3.5 text-red-400" /> ERROU! (Defesa não superada)
+                              </span>
+                            )}
+                          </div>
+                        )}
+
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-amber-300 font-cinzel font-bold flex items-center gap-1.5">
                             <Swords className="w-3.5 h-3.5 text-amber-400" />
                             DANO CAUSADO ({roll.damageType === 'alto' ? 'Dado Alto / Maior' : 'Dado Baixo / Menor'}):
                           </span>
-                          <span className="font-mono font-bold text-base text-yellow-300 bg-amber-950 px-2.5 py-0.5 rounded border border-amber-500/50 shadow">
+                          <span className={`font-mono font-bold text-base px-2.5 py-0.5 rounded border shadow ${
+                            roll.acertou === false
+                              ? 'text-slate-400 bg-neutral-900/90 border-neutral-700'
+                              : 'text-yellow-300 bg-amber-950 border-amber-500/50'
+                          }`}>
                             {roll.danoCausado} Dano
                           </span>
                         </div>
@@ -634,13 +699,19 @@ export default function DiceRollerDrawer({
                             <span>
                               Alvo: <strong className="text-red-300">{roll.targetMonsterName}</strong>
                             </span>
-                            {roll.novaVidaCriatura !== null ? (
-                              <span className="text-emerald-400 font-bold">
-                                Vida atualizada: {roll.novaVidaCriatura} HP (-{roll.danoCausado})
-                              </span>
+                            {roll.acertou ? (
+                              roll.novaVidaCriatura !== null ? (
+                                <span className="text-emerald-400 font-bold">
+                                  Vida atualizada: {roll.novaVidaCriatura} HP (-{roll.danoCausado})
+                                </span>
+                              ) : (
+                                <span className="text-amber-400">
+                                  -{roll.danoCausado} HP
+                                </span>
+                              )
                             ) : (
-                              <span className="text-amber-400">
-                                -{roll.danoCausado} HP
+                              <span className="text-slate-400 italic">
+                                Nenhum dano aplicado
                               </span>
                             )}
                           </div>
