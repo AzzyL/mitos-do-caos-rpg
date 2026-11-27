@@ -31,6 +31,7 @@ export default function CampaignRoom({
   const [members, setMembers] = useState([]);
   const [rolls, setRolls] = useState([]);
   const [chaosBets, setChaosBets] = useState([]);
+  const [monsters, setMonsters] = useState([]);
   const [inspectedMember, setInspectedMember] = useState(null);
 
   const isGM = campaign.mestre_id === user?.id;
@@ -52,19 +53,21 @@ export default function CampaignRoom({
     return () => clearTimeout(timer);
   }, [character, campaign.id, user?.id, isGM]);
 
-  // 2. Carrega e escuta em Tempo Real: Membros, Rolagens e Apostas com o Caos
+  // 2. Carrega e escuta em Tempo Real: Membros, Rolagens, Apostas com o Caos e Monstros
   useEffect(() => {
     if (!supabase || !campaign) return;
 
     const loadAll = async () => {
-      const [{ data: mData }, { data: rData }, { data: bData }] = await Promise.all([
+      const [{ data: mData }, { data: rData }, { data: bData }, { data: monData }] = await Promise.all([
         supabase.from('campaign_members').select('*').eq('campaign_id', campaign.id),
         supabase.from('campaign_rolls').select('*').eq('campaign_id', campaign.id).order('created_at', { ascending: false }).limit(50),
-        supabase.from('chaos_bets').select('*').eq('campaign_id', campaign.id).order('created_at', { ascending: false }).limit(5)
+        supabase.from('chaos_bets').select('*').eq('campaign_id', campaign.id).order('created_at', { ascending: false }).limit(5),
+        supabase.from('campaign_monsters').select('*').eq('campaign_id', campaign.id).order('created_at', { ascending: true })
       ]);
       if (mData) setMembers(mData);
       if (rData) setRolls(rData);
       if (bData) setChaosBets(bData);
+      if (monData) setMonsters(monData);
     };
 
     loadAll();
@@ -74,6 +77,7 @@ export default function CampaignRoom({
       .on('postgres_changes', { event: '*', schema: 'public', table: 'campaign_members', filter: `campaign_id=eq.${campaign.id}` }, loadAll)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'campaign_rolls', filter: `campaign_id=eq.${campaign.id}` }, loadAll)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'chaos_bets', filter: `campaign_id=eq.${campaign.id}` }, loadAll)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'campaign_monsters', filter: `campaign_id=eq.${campaign.id}` }, loadAll)
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
@@ -81,6 +85,9 @@ export default function CampaignRoom({
 
   // Filtra apenas os jogadores (exclui o Mestre dos cards de personagem)
   const playerMembers = members.filter(m => m.role !== 'mestre');
+
+  // Criaturas visíveis na cena (visivel_jogadores === true)
+  const visibleMonsters = monsters.filter(m => (m.visivel_jogadores === true || m.ficha_data?.visivel_jogadores === true));
 
   // Requisito 3: Jogadores veem todas as rolagens EXCETO as rolagens ocultas do Mestre
   const visibleRollsForPlayers = rolls.filter(r => !r.is_gm_roll || r.is_public);
@@ -187,6 +194,72 @@ export default function CampaignRoom({
           allRolls={rolls}
           pendingBets={pendingBets}
         />
+      )}
+
+      {/* =====================================================================
+          CRIATURAS NA CENA (APENAS MONSTROS COM visivel_jogadores === true)
+          ===================================================================== */}
+      {visibleMonsters.length > 0 && (
+        <div className="bg-[#15111e] border-2 border-red-900/60 rounded-2xl p-4 sm:p-5 shadow-2xl space-y-4">
+          <div className="flex items-center justify-between border-b border-red-900/40 pb-2">
+            <h3 className="font-cinzel text-sm sm:text-base font-bold text-red-300 uppercase flex items-center gap-2">
+              <Skull className="w-5 h-5 text-red-500 animate-pulse" /> CRIATURAS NA CENA ({visibleMonsters.length})
+            </h3>
+            <span className="text-[11px] text-red-400/80 font-mono">
+              Inimigos visíveis no combate
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {visibleMonsters.map((monster) => {
+              const maxHp = monster.vida_max || 20;
+              const currentHp = monster.vida_atual ?? maxHp;
+              const hpPercent = maxHp > 0 ? Math.max(0, Math.min(100, (currentHp / maxHp) * 100)) : 0;
+
+              return (
+                <div
+                  key={monster.id}
+                  className="bg-black/80 rounded-2xl p-4 border border-red-950/80 shadow-xl space-y-3"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-10 h-10 rounded-full bg-red-950/80 border border-red-500/40 flex items-center justify-center flex-shrink-0 shadow-md">
+                        <Skull className="w-5 h-5 text-red-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-cinzel font-bold text-base text-red-200">
+                          {monster.nome}
+                        </h4>
+                        <span className="text-[10px] bg-red-950 text-red-300 border border-red-800/40 px-2 py-0.5 rounded font-mono font-bold">
+                          ND {monster.nd}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Vida: ??? / ??? com barra visual proporcional para jogadores */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex items-center justify-between text-xs font-mono">
+                      <span className="text-red-400 font-cinzel font-bold flex items-center gap-1">
+                        <Heart className="w-3.5 h-3.5 fill-red-500/20" /> Vida
+                      </span>
+                      <span className="text-slate-300 font-bold font-mono tracking-widest">
+                        {isGM ? `${currentHp} / ${maxHp}` : '??? / ???'}
+                      </span>
+                    </div>
+
+                    <div className="w-full h-2.5 bg-neutral-900 rounded-full overflow-hidden border border-neutral-800">
+                      <div
+                        className="h-full bg-gradient-to-r from-red-700 via-rose-600 to-red-500 transition-all duration-300"
+                        style={{ width: `${hpPercent}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       )}
 
       {/* =====================================================================

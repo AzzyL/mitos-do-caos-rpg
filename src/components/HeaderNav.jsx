@@ -71,17 +71,17 @@ export default function HeaderNav({
           </div>
         </div>
 
-        {/* Abas Ficha / Campanha */}
+        {/* Abas Fichas / Campanhas */}
         <div className="flex items-center bg-black/70 p-1 rounded-xl border border-purple-900/40">
           <button
-            onClick={() => onChangeView('ficha')}
+            onClick={() => onChangeView('fichas')}
             className={`px-3 py-1 rounded-lg text-xs font-cinzel font-bold transition-all ${
-              activeView === 'ficha'
+              activeView === 'fichas' || activeView === 'ficha'
                 ? 'bg-purple-700 text-white shadow'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            Minha Ficha
+            Fichas
           </button>
           <button
             onClick={() => onChangeView('campanha')}
@@ -91,7 +91,7 @@ export default function HeaderNav({
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            Campanha
+            Campanhas
           </button>
         </div>
 
@@ -106,7 +106,7 @@ export default function HeaderNav({
             <ShieldAlert className="w-4 h-4 text-red-400" />
             <span className="hidden sm:inline">Apostar com o Caos</span>
             <span className="bg-red-500/20 text-red-300 px-1.5 py-0.5 rounded text-[10px] font-mono">
-              {character.pontosCaos ?? 1} PC
+              {character?.pontosCaos ?? 1} PC
             </span>
           </button>
 

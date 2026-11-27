@@ -74,8 +74,46 @@ export const INITIAL_CHARACTER = {
   ],
 
   // Inventário (Começa 100% VAZIO para a pessoa criar os próprios itens)
-  inventario: []
+  inventario: [],
+
+  // Servos do Personagem (Até 6 servos)
+  servos: []
 };
+
+// Helper para criar um novo Servo com a estrutura completa
+export function createDefaultServo(index = 1) {
+  return {
+    id: `servo_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+    nome: `Servo #${index}`,
+    aparencia: "",
+    objetivoBuff: "",
+    elemento: "",
+    nivel: 1,
+    existenciaAtual: 10,
+    existenciaMax: 10,
+    akashaAtual: 2,
+    akashaMax: 2,
+    atributos: {
+      forca: "1D4",
+      inteligencia: "1D4",
+      agilidade: "1D4",
+      vitalidade: "1D4",
+      aparencia: "1D4",
+      instinto: "1D4"
+    },
+    pericias: {
+      esforco: "1D4",
+      mente: "1D4",
+      destreza: "1D4",
+      resistencia: "1D4",
+      social: "1D4",
+      sentidos: "1D4"
+    },
+    ataques: [
+      { id: `atk_${Date.now()}_1`, nome: "Ataque Básico", dadoAtaque: "1D6", dadoDano: "1D6" }
+    ]
+  };
+}
 
 // Map face maximum and half face
 export function getDieStats(dieStr) {

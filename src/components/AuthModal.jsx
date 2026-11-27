@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import { X, Flame, LogIn, UserPlus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
-export default function AuthModal({ isOpen, onClose }) {
+export default function AuthModal({
+  isOpen = true,
+  onClose,
+  inline = false,
+  hideClose = false,
+  onGuestLogin = null
+}) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -26,7 +32,7 @@ export default function AuthModal({ isOpen, onClose }) {
         : await supabase.auth.signInWithPassword({ email, password });
 
       if (error) throw error;
-      onClose();
+      if (onClose) onClose();
     } catch (err) {
       setErrorMsg(err.message || 'Erro ao autenticar.');
     } finally {
@@ -34,15 +40,21 @@ export default function AuthModal({ isOpen, onClose }) {
     }
   };
 
+  const containerClasses = inline
+    ? "w-full max-w-md mx-auto"
+    : "no-print fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4";
+
   return (
-    <div className="no-print fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-      <div className="bg-[#12101b] border border-purple-800/50 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-purple-950/60"
-        >
-          <X className="w-5 h-5" />
-        </button>
+    <div className={containerClasses}>
+      <div className="bg-[#12101b] border border-purple-800/50 rounded-2xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
+        {!hideClose && onClose && (
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-purple-950/60 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
 
         <div className="flex items-center gap-3 mb-5">
           <div className="w-10 h-10 rounded-xl bg-purple-950 border border-purple-500/40 flex items-center justify-center">
@@ -52,7 +64,7 @@ export default function AuthModal({ isOpen, onClose }) {
             <h3 className="font-cinzel text-lg font-bold text-white">
               {isSignUp ? 'Criar Conta' : 'Entrar na Conta'}
             </h3>
-            <p className="text-xs text-slate-400">Acesse as mesas e campanhas ao vivo</p>
+            <p className="text-xs text-slate-400">Acesse as fichas e campanhas ao vivo</p>
           </div>
         </div>
 
@@ -91,21 +103,31 @@ export default function AuthModal({ isOpen, onClose }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 text-white font-cinzel font-bold text-xs flex items-center justify-center gap-2 shadow-lg disabled:opacity-50"
+            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 text-white font-cinzel font-bold text-xs flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             {isSignUp ? <UserPlus className="w-4 h-4" /> : <LogIn className="w-4 h-4" />}
             <span>{loading ? 'Aguarde...' : isSignUp ? 'Cadastrar e Entrar' : 'Entrar'}</span>
           </button>
         </form>
 
-        <div className="mt-4 pt-3 border-t border-purple-900/30 text-center">
+        <div className="mt-4 pt-3 border-t border-purple-900/30 text-center space-y-2">
           <button
             type="button"
             onClick={() => { setIsSignUp(!isSignUp); setErrorMsg(''); }}
-            className="text-xs text-purple-300 hover:text-white underline"
+            className="text-xs text-purple-300 hover:text-white underline block mx-auto"
           >
             {isSignUp ? 'Já tem conta? Faça login' : 'Não tem conta? Cadastre-se agora'}
           </button>
+
+          {onGuestLogin && (
+            <button
+              type="button"
+              onClick={onGuestLogin}
+              className="text-xs text-slate-400 hover:text-slate-200 block mx-auto pt-1 transition-colors"
+            >
+              Continuar no modo local (offline)
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Heart,
   Brain,
@@ -11,7 +11,10 @@ import {
   PackageOpen,
   Camera,
   X,
-  ShieldAlert
+  ShieldAlert,
+  ChevronDown,
+  ChevronUp,
+  Swords
 } from 'lucide-react';
 import sistemaData from '../data/sistema.json';
 import { 
@@ -23,11 +26,32 @@ import {
   calculateMaxWeight,
   getMaoLockStatus,
   getAtuacaoConfig,
-  getCaminhoConfig
+  getCaminhoConfig,
+  createDefaultServo
 } from '../utils/characterCalculations';
 import { DIE_STEPS } from '../utils/diceRoller';
 
 const ROMAN_NUMERALS = { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' };
+
+const SERVO_DIE_STEPS = ['1D4', '1D6', '1D8', '1D10', '1D12'];
+
+const ATRIBUTOS_KEYS = [
+  { id: 'forca', nome: 'Força' },
+  { id: 'inteligencia', nome: 'Inteligência' },
+  { id: 'agilidade', nome: 'Agilidade' },
+  { id: 'vitalidade', nome: 'Vitalidade' },
+  { id: 'aparencia', nome: 'Aparência' },
+  { id: 'instinto', nome: 'Instinto' }
+];
+
+const PERICIAS_KEYS = [
+  { id: 'esforco', nome: 'Esforço' },
+  { id: 'mente', nome: 'Mente' },
+  { id: 'destreza', nome: 'Destreza' },
+  { id: 'resistencia', nome: 'Resistência' },
+  { id: 'social', nome: 'Social' },
+  { id: 'sentidos', nome: 'Sentidos' }
+];
 
 export default function CharacterSheet({
   character,
@@ -49,6 +73,16 @@ export default function CharacterSheet({
 
   const nivelAtual = character.nivelPessoal || 1;
   const pontosCaosAtuais = character.pontosCaos ?? 1;
+
+  // Servos State
+  const [expandedServos, setExpandedServos] = useState({});
+  const toggleServoExpanded = (id) => {
+    setExpandedServos(prev => ({ ...prev, [id]: prev[id] === undefined ? false : !prev[id] }));
+  };
+
+  const servosList = character.servos || [];
+  const canAddServo = servosList.length < 6;
+  const isVersado = (character.atuacao || '').toLowerCase() === 'versado';
 
   // Field update helper
   const updateField = (field, value) => {
@@ -288,6 +322,67 @@ export default function CharacterSheet({
   const handleRemoveItem = (index) => {
     const updated = character.inventario.filter((_, i) => i !== index);
     updateField('inventario', updated);
+  };
+
+  // Servos Handlers
+  const handleAddServo = () => {
+    if (servosList.length >= 6) return;
+    const newServo = createDefaultServo(servosList.length + 1);
+    updateField('servos', [...servosList, newServo]);
+    setExpandedServos(prev => ({ ...prev, [newServo.id]: true }));
+  };
+
+  const handleRemoveServo = (servoId, servoNome) => {
+    if (window.confirm(`Deseja realmente remover o servo "${servoNome || 'Sem Nome'}"?`)) {
+      const updated = servosList.filter(s => s.id !== servoId);
+      updateField('servos', updated);
+    }
+  };
+
+  const handleUpdateServo = (index, field, value) => {
+    const updated = [...servosList];
+    updated[index] = { ...updated[index], [field]: value };
+    updateField('servos', updated);
+  };
+
+  const handleUpdateServoNested = (index, section, key, value) => {
+    const updated = [...servosList];
+    updated[index] = {
+      ...updated[index],
+      [section]: {
+        ...updated[index][section],
+        [key]: value
+      }
+    };
+    updateField('servos', updated);
+  };
+
+  const handleAddServoAttack = (servoIndex) => {
+    const updated = [...servosList];
+    const atks = updated[servoIndex].ataques || [];
+    updated[servoIndex] = {
+      ...updated[servoIndex],
+      ataques: [
+        ...atks,
+        { id: `atk_${Date.now()}`, nome: "Ataque", dadoAtaque: "1D6", dadoDano: "1D6" }
+      ]
+    };
+    updateField('servos', updated);
+  };
+
+  const handleUpdateServoAttack = (servoIndex, atkIndex, field, value) => {
+    const updated = [...servosList];
+    const atks = [...(updated[servoIndex].ataques || [])];
+    atks[atkIndex] = { ...atks[atkIndex], [field]: value };
+    updated[servoIndex] = { ...updated[servoIndex], ataques: atks };
+    updateField('servos', updated);
+  };
+
+  const handleRemoveServoAttack = (servoIndex, atkIndex) => {
+    const updated = [...servosList];
+    const atks = (updated[servoIndex].ataques || []).filter((_, i) => i !== atkIndex);
+    updated[servoIndex] = { ...updated[servoIndex], ataques: atks };
+    updateField('servos', updated);
   };
 
   // Quick Roll on clicking Atributo
@@ -1578,6 +1673,508 @@ export default function CharacterSheet({
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+      </div>
+
+      {/* =========================================================================
+          BLOCO 8: SERVOS DO PERSONAGEM (Até 6 Servos)
+          ========================================================================= */}
+      <div className="bg-[#111111]/90 rounded-2xl p-4 sm:p-5 border border-black/40 shadow-xl mt-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 border-b border-neutral-800 pb-3 gap-2">
+          <div className="flex items-center gap-2.5">
+            <h3 className="font-cinzel text-xs sm:text-sm font-bold tracking-widest text-slate-200 uppercase flex items-center gap-2">
+              <Swords className="w-4 h-4 text-purple-400" /> SERVOS ({servosList.length} / 6)
+            </h3>
+            {isVersado && (
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/40">
+                Versado: Akasha de Servo Ativo
+              </span>
+            )}
+          </div>
+
+          {canAddServo ? (
+            <button
+              type="button"
+              onClick={handleAddServo}
+              className="flex items-center gap-1.5 text-xs bg-purple-950/80 hover:bg-purple-900 text-purple-200 px-3.5 py-1.5 rounded-xl border border-purple-700/50 transition-all font-semibold shadow-md active:scale-95"
+            >
+              <Plus className="w-3.5 h-3.5" /> Adicionar Servo
+            </button>
+          ) : (
+            <span className="text-[11px] font-mono text-slate-500 bg-neutral-900 px-3 py-1 rounded-lg border border-neutral-800">
+              Limite de 6 servos atingido
+            </span>
+          )}
+        </div>
+
+        {servosList.length === 0 ? (
+          <div className="text-center py-8 px-4 bg-black/50 rounded-xl border border-neutral-800 text-slate-400">
+            <p className="text-xs font-semibold text-slate-300">Nenhum servo invocado ou vinculado.</p>
+            <p className="text-[11px] text-slate-500 mt-1">
+              Clique em "+ Adicionar Servo" acima para cadastrar seus familiares, invocações ou construtos.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {servosList.map((servo, idx) => {
+              const isExpanded = expandedServos[servo.id] !== false; // Expansível por padrão
+
+              return (
+                <div
+                  key={servo.id || idx}
+                  className="bg-black/75 rounded-2xl border border-neutral-800 hover:border-purple-900/60 transition-all overflow-hidden shadow-lg"
+                >
+                  {/* Cabeçalho do Card de Servo (Expansível / Recolhível) */}
+                  <div
+                    onClick={() => toggleServoExpanded(servo.id)}
+                    className="p-3.5 sm:p-4 flex items-center justify-between gap-3 cursor-pointer bg-neutral-950/80 hover:bg-neutral-900/80 transition-colors select-none"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <button
+                        type="button"
+                        className="p-1 rounded bg-neutral-800 text-slate-300 hover:text-white"
+                        title={isExpanded ? "Recolher" : "Expandir"}
+                      >
+                        {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      </button>
+
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-cinzel font-bold text-sm text-purple-200 truncate">
+                            {servo.nome || `Servo #${idx + 1}`}
+                          </span>
+                          <span className="text-[10px] bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 px-2 py-0.2 rounded-full font-mono font-bold">
+                            Nv {servo.nivel || 1}
+                          </span>
+                          {servo.elemento && (
+                            <span className="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-800/40 px-2 py-0.2 rounded-full font-mono">
+                              {servo.elemento}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="text-[11px] text-slate-400 font-mono mt-0.5 flex items-center gap-3">
+                          <span className="text-red-400 flex items-center gap-1">
+                            <Heart className="w-3 h-3" /> {servo.existenciaAtual ?? 10} / {servo.existenciaMax ?? 10}
+                          </span>
+                          {isVersado && (
+                            <span className="text-cyan-400 flex items-center gap-1">
+                              <Sparkles className="w-3 h-3" /> {servo.akashaAtual ?? 2} / {servo.akashaMax ?? 2}
+                            </span>
+                          )}
+                          {servo.objetivoBuff && (
+                            <span className="text-slate-400 hidden sm:inline truncate max-w-[200px]">
+                              • Buff: {servo.objetivoBuff}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveServo(servo.id, servo.nome);
+                        }}
+                        className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-950/40 transition-colors"
+                        title="Remover servo"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Conteúdo Expansível do Servo */}
+                  {isExpanded && (
+                    <div className="p-4 sm:p-5 border-t border-neutral-800 space-y-4">
+                      {/* Linha 1: Nome, Aparência, Nível */}
+                      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                        <div className="sm:col-span-5 bg-neutral-900/80 rounded-xl p-2.5 border border-neutral-800">
+                          <label className="text-[9px] font-cinzel tracking-wider text-slate-400 uppercase block mb-1">
+                            NOME DO SERVO
+                          </label>
+                          <input
+                            type="text"
+                            value={servo.nome || ''}
+                            onChange={(e) => handleUpdateServo(idx, 'nome', e.target.value)}
+                            placeholder="Ex: Lobo Espectral..."
+                            className="w-full bg-transparent text-xs font-bold text-white focus:outline-none"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-4 bg-neutral-900/80 rounded-xl p-2.5 border border-neutral-800">
+                          <label className="text-[9px] font-cinzel tracking-wider text-slate-400 uppercase block mb-1">
+                            APARÊNCIA / FORMA
+                          </label>
+                          <input
+                            type="text"
+                            value={servo.aparencia || ''}
+                            onChange={(e) => handleUpdateServo(idx, 'aparencia', e.target.value)}
+                            placeholder="Ex: Quimera de chamas..."
+                            className="w-full bg-transparent text-xs text-slate-200 focus:outline-none"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-3 bg-neutral-900/80 rounded-xl p-2.5 border border-neutral-800 flex flex-col justify-between">
+                          <label className="text-[9px] font-cinzel tracking-wider text-slate-400 uppercase block mb-1">
+                            NÍVEL (1 A 8)
+                          </label>
+                          <div className="flex items-center justify-between">
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateServo(idx, 'nivel', Math.max(1, (parseInt(servo.nivel, 10) || 1) - 1))}
+                              className="w-6 h-6 rounded bg-neutral-800 hover:bg-neutral-700 text-xs font-bold text-slate-200"
+                            >
+                              -
+                            </button>
+                            <span className="font-cinzel font-bold text-xs text-yellow-400 font-mono">
+                              Nível {servo.nivel || 1}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateServo(idx, 'nivel', Math.min(8, (parseInt(servo.nivel, 10) || 1) + 1))}
+                              className="w-6 h-6 rounded bg-neutral-800 hover:bg-neutral-700 text-xs font-bold text-slate-200"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Linha 2: Elemento e Objetivo (Buff) */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="bg-neutral-900/80 rounded-xl p-2.5 border border-neutral-800">
+                          <label className="text-[9px] font-cinzel tracking-wider text-slate-400 uppercase block mb-1">
+                            ELEMENTO DO SERVO
+                          </label>
+                          <input
+                            type="text"
+                            value={servo.elemento || ''}
+                            onChange={(e) => handleUpdateServo(idx, 'elemento', e.target.value)}
+                            placeholder="Ex: Fogo, Sombra, Sangue..."
+                            className="w-full bg-transparent text-xs font-bold text-cyan-300 focus:outline-none"
+                          />
+                        </div>
+
+                        <div className="bg-neutral-900/80 rounded-xl p-2.5 border border-neutral-800">
+                          <label className="text-[9px] font-cinzel tracking-wider text-slate-400 uppercase block mb-1">
+                            OBJETIVO (BUFF CONCEDIDO AO JOGADOR)
+                          </label>
+                          <input
+                            type="text"
+                            value={servo.objetivoBuff || ''}
+                            onChange={(e) => handleUpdateServo(idx, 'objetivoBuff', e.target.value)}
+                            placeholder="Ex: Concede +1D4 em Defesa ou Esquiva..."
+                            className="w-full bg-transparent text-xs font-medium text-purple-300 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Linha 3: Status Vitais do Servo (Existência & Akasha [se Versado]) */}
+                      <div className={`grid grid-cols-1 ${isVersado ? 'sm:grid-cols-2' : ''} gap-3`}>
+                        {/* EXISTÊNCIA (VIDA) */}
+                        <div className="bg-neutral-900/90 rounded-xl p-3 border border-neutral-800 space-y-2">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-cinzel font-bold text-red-400 flex items-center gap-1.5">
+                              <Heart className="w-4 h-4 fill-red-500/20" /> EXISTÊNCIA (VIDA)
+                            </span>
+                            <div className="flex items-center gap-1.5 font-mono">
+                              <input
+                                type="number"
+                                value={servo.existenciaAtual ?? 10}
+                                onChange={(e) => handleUpdateServo(idx, 'existenciaAtual', parseInt(e.target.value, 10) || 0)}
+                                className="w-12 text-center bg-black text-red-300 font-bold text-xs rounded py-0.5 border border-neutral-700 focus:outline-none"
+                              />
+                              <span className="text-slate-500">/</span>
+                              <input
+                                type="number"
+                                value={servo.existenciaMax ?? 10}
+                                onChange={(e) => handleUpdateServo(idx, 'existenciaMax', parseInt(e.target.value, 10) || 0)}
+                                className="w-12 text-center bg-black text-slate-300 font-bold text-xs rounded py-0.5 border border-neutral-700 focus:outline-none"
+                                title="Existência Máxima"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex justify-between items-center text-[10px] text-slate-400 pt-1">
+                            <span>Resistência Vital</span>
+                            <div className="flex gap-1">
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateServo(idx, 'existenciaAtual', Math.max(0, (servo.existenciaAtual ?? 10) - 1))}
+                                className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-slate-200"
+                              >
+                                -1
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateServo(idx, 'existenciaAtual', Math.min(servo.existenciaMax ?? 10, (servo.existenciaAtual ?? 10) + 1))}
+                                className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-slate-200"
+                              >
+                                +1
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateServo(idx, 'existenciaAtual', servo.existenciaMax ?? 10)}
+                                className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-emerald-400"
+                              >
+                                Full
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* AKASHA (RENDERIZADO APENAS SE VERSADO) */}
+                        {isVersado && (
+                          <div className="bg-neutral-900/90 rounded-xl p-3 border border-neutral-800 space-y-2">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="font-cinzel font-bold text-cyan-400 flex items-center gap-1.5">
+                                <Sparkles className="w-4 h-4 fill-cyan-500/20" /> AKASHA DO SERVO
+                              </span>
+                              <div className="flex items-center gap-1.5 font-mono">
+                                <input
+                                  type="number"
+                                  value={servo.akashaAtual ?? 2}
+                                  onChange={(e) => handleUpdateServo(idx, 'akashaAtual', parseInt(e.target.value, 10) || 0)}
+                                  className="w-12 text-center bg-black text-cyan-300 font-bold text-xs rounded py-0.5 border border-neutral-700 focus:outline-none"
+                                />
+                                <span className="text-slate-500">/</span>
+                                <input
+                                  type="number"
+                                  value={servo.akashaMax ?? 2}
+                                  onChange={(e) => handleUpdateServo(idx, 'akashaMax', parseInt(e.target.value, 10) || 0)}
+                                  className="w-12 text-center bg-black text-slate-300 font-bold text-xs rounded py-0.5 border border-neutral-700 focus:outline-none"
+                                  title="Akasha Máximo"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="flex justify-between items-center text-[10px] text-slate-400 pt-1">
+                              <span className="text-cyan-400/80">Canalização Mântrica</span>
+                              <div className="flex gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateServo(idx, 'akashaAtual', Math.max(0, (servo.akashaAtual ?? 2) - 1))}
+                                  className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-slate-200"
+                                >
+                                  -1
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateServo(idx, 'akashaAtual', Math.min(servo.akashaMax ?? 2, (servo.akashaAtual ?? 2) + 1))}
+                                  className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-slate-200"
+                                >
+                                  +1
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateServo(idx, 'akashaAtual', servo.akashaMax ?? 2)}
+                                  className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-cyan-400"
+                                >
+                                  Full
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Linha 4: Atributos do Servo */}
+                      <div>
+                        <span className="text-[10px] font-cinzel font-bold text-slate-400 uppercase tracking-wider block mb-2">
+                          ATRIBUTOS DO SERVO (D4 A D12)
+                        </span>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+                          {ATRIBUTOS_KEYS.map((attr) => {
+                            const dieVal = servo.atributos?.[attr.id] || '1D4';
+                            return (
+                              <div key={attr.id} className="bg-black/80 rounded-xl p-2 border border-neutral-800 space-y-1">
+                                <div className="flex items-center justify-between text-[11px]">
+                                  <span className="text-slate-300 font-cinzel font-bold text-[10px] truncate">
+                                    {attr.nome}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => onQuickRoll({
+                                      title: `Servo ${servo.nome || 'Servo'}: ${attr.nome}`,
+                                      periciaName: null,
+                                      atributoName: attr.nome,
+                                      periciaDie: null,
+                                      atributoDie: dieVal,
+                                      bonusDice: [],
+                                      bonusModifier: 0
+                                    })}
+                                    className="p-1 rounded bg-purple-950/60 hover:bg-purple-900 text-purple-300"
+                                    title={`Rolar ${attr.nome} (${dieVal})`}
+                                  >
+                                    <Dices className="w-3 h-3" />
+                                  </button>
+                                </div>
+                                <select
+                                  value={dieVal}
+                                  onChange={(e) => handleUpdateServoNested(idx, 'atributos', attr.id, e.target.value)}
+                                  className="w-full bg-neutral-900 text-yellow-400 font-cinzel font-bold text-xs py-1 px-1.5 rounded focus:outline-none cursor-pointer"
+                                >
+                                  {SERVO_DIE_STEPS.map(d => (
+                                    <option key={d} value={d}>{d}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Linha 5: Perícias do Servo */}
+                      <div>
+                        <span className="text-[10px] font-cinzel font-bold text-slate-400 uppercase tracking-wider block mb-2">
+                          PERÍCIAS DO SERVO (D4 A D12)
+                        </span>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+                          {PERICIAS_KEYS.map((per) => {
+                            const dieVal = servo.pericias?.[per.id] || '1D4';
+                            return (
+                              <div key={per.id} className="bg-black/80 rounded-xl p-2 border border-neutral-800 space-y-1">
+                                <div className="flex items-center justify-between text-[11px]">
+                                  <span className="text-slate-300 font-cinzel font-bold text-[10px] truncate">
+                                    {per.nome}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => onQuickRoll({
+                                      title: `Servo ${servo.nome || 'Servo'}: ${per.nome}`,
+                                      periciaName: per.nome,
+                                      atributoName: null,
+                                      periciaDie: dieVal,
+                                      atributoDie: null,
+                                      bonusDice: [],
+                                      bonusModifier: 0
+                                    })}
+                                    className="p-1 rounded bg-cyan-950/60 hover:bg-cyan-900 text-cyan-300"
+                                    title={`Rolar ${per.nome} (${dieVal})`}
+                                  >
+                                    <Dices className="w-3 h-3" />
+                                  </button>
+                                </div>
+                                <select
+                                  value={dieVal}
+                                  onChange={(e) => handleUpdateServoNested(idx, 'pericias', per.id, e.target.value)}
+                                  className="w-full bg-neutral-900 text-cyan-400 font-cinzel font-bold text-xs py-1 px-1.5 rounded focus:outline-none cursor-pointer"
+                                >
+                                  {SERVO_DIE_STEPS.map(d => (
+                                    <option key={d} value={d}>{d}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Linha 6: Ataques do Servo */}
+                      <div className="space-y-2 pt-2 border-t border-neutral-800">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-cinzel font-bold text-slate-400 uppercase tracking-wider">
+                            ATAQUES DO SERVO
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleAddServoAttack(idx)}
+                            className="flex items-center gap-1 text-[11px] text-purple-300 hover:text-white bg-purple-950/60 hover:bg-purple-900 px-2 py-0.5 rounded border border-purple-800/40"
+                          >
+                            <Plus className="w-3 h-3" /> Adicionar Ataque
+                          </button>
+                        </div>
+
+                        {(!servo.ataques || servo.ataques.length === 0) ? (
+                          <p className="text-[11px] text-slate-500 italic">Nenhum ataque configurado para este servo.</p>
+                        ) : (
+                          <div className="space-y-2">
+                            {servo.ataques.map((atk, atkIdx) => (
+                              <div key={atk.id || atkIdx} className="flex flex-wrap items-center gap-2 bg-neutral-950 p-2 rounded-xl border border-neutral-800">
+                                <input
+                                  type="text"
+                                  value={atk.nome || ''}
+                                  onChange={(e) => handleUpdateServoAttack(idx, atkIdx, 'nome', e.target.value)}
+                                  placeholder="Nome do ataque..."
+                                  className="flex-1 min-w-[120px] bg-transparent text-xs font-bold text-white focus:outline-none px-1"
+                                />
+
+                                <div className="flex items-center gap-1.5">
+                                  <label className="text-[9px] text-slate-400 uppercase">Acerto:</label>
+                                  <input
+                                    type="text"
+                                    value={atk.dadoAtaque || ''}
+                                    onChange={(e) => handleUpdateServoAttack(idx, atkIdx, 'dadoAtaque', e.target.value)}
+                                    placeholder="Ex: 1D6"
+                                    className="w-16 bg-neutral-900 text-center font-mono text-xs text-cyan-300 px-1 py-0.5 rounded border border-neutral-700"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => onQuickRoll({
+                                      title: `Ataque: ${servo.nome} — ${atk.nome || 'Ataque'}`,
+                                      periciaName: null,
+                                      atributoName: null,
+                                      periciaDie: atk.dadoAtaque || '1D6',
+                                      atributoDie: null,
+                                      bonusDice: [],
+                                      bonusModifier: 0
+                                    })}
+                                    className="p-1 rounded bg-cyan-950 text-cyan-300 hover:text-white"
+                                    title="Rolar Ataque"
+                                  >
+                                    <Dices className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+
+                                <div className="flex items-center gap-1.5">
+                                  <label className="text-[9px] text-slate-400 uppercase">Dano:</label>
+                                  <input
+                                    type="text"
+                                    value={atk.dadoDano || ''}
+                                    onChange={(e) => handleUpdateServoAttack(idx, atkIdx, 'dadoDano', e.target.value)}
+                                    placeholder="Ex: 1D8"
+                                    className="w-16 bg-neutral-900 text-center font-mono text-xs text-yellow-300 px-1 py-0.5 rounded border border-neutral-700"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => onQuickRoll({
+                                      title: `Dano: ${servo.nome} — ${atk.nome || 'Ataque'}`,
+                                      periciaName: null,
+                                      atributoName: null,
+                                      periciaDie: atk.dadoDano || '1D8',
+                                      atributoDie: null,
+                                      bonusDice: [],
+                                      bonusModifier: 0
+                                    })}
+                                    className="p-1 rounded bg-yellow-950 text-yellow-300 hover:text-white"
+                                    title="Rolar Dano"
+                                  >
+                                    <Dices className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveServoAttack(idx, atkIdx)}
+                                  className="p-1 text-neutral-600 hover:text-red-400 ml-auto"
+                                  title="Remover ataque"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
