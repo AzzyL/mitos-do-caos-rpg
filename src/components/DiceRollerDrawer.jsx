@@ -174,7 +174,7 @@ export default function DiceRollerDrawer({
       try {
         const { data, error: fetchErr } = await supabase
           .from('campaign_monsters')
-          .select('id, nome, vida_atual, vida_max, defesa, ficha_data')
+          .select('*')
           .eq('id', selectedTargetId)
           .single();
 
@@ -191,11 +191,22 @@ export default function DiceRollerDrawer({
 
       if (monsterToEvaluate) {
         monsterAlvoNome = monsterToEvaluate.nome;
-        const rawDefesa = monsterToEvaluate.defesa ?? monsterToEvaluate.ficha_data?.defesa ?? monsterToEvaluate.ficha_data?.esquiva;
-        const defesaAlvo = Number(rawDefesa) || 0;
+        const fichaData = typeof monsterToEvaluate.ficha_data === 'string'
+          ? (() => { try { return JSON.parse(monsterToEvaluate.ficha_data); } catch { return {}; } })()
+          : (monsterToEvaluate.ficha_data || {});
 
-        // Regra de Acerto vs. Erro comparando total do ataque com a Defesa
-        if (totalAtaque >= defesaAlvo) {
+        const rawDefesa = monsterToEvaluate.defesa ?? 
+          fichaData.defesa ?? 
+          fichaData.defesaPassiva ?? 
+          fichaData.esquiva;
+
+        const match = String(rawDefesa ?? '').match(/\d+/);
+        const defesaAlvo = match ? parseInt(match[0], 10) : 0;
+
+        console.log('[Ataque]', { totalAtaque, rawDefesa, defesaAlvo });
+
+        // Regra de Acerto vs. Erro: só executa dano se totalAtaque >= defesaAlvo e defesaAlvo > 0
+        if (defesaAlvo > 0 && totalAtaque >= defesaAlvo) {
           // ACERTOU!
           acertou = true;
           statusAtaque = 'ACERTOU!';
@@ -224,6 +235,7 @@ export default function DiceRollerDrawer({
           acertou = false;
           statusAtaque = 'ERROU! (Defesa não superada)';
           danoCausado = 0;
+          novaVidaCriatura = null;
           // NÃO executa nenhum .update() de vida no Supabase
         }
       }
