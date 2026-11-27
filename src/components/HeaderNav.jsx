@@ -14,6 +14,11 @@ import {
 
 export default function HeaderNav({
   character,
+  user,
+  activeView,
+  onChangeView,
+  onOpenAuth,
+  onLogout,
   onReset,
   onImport,
   onExport,
@@ -64,6 +69,30 @@ export default function HeaderNav({
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Abas Ficha / Campanha */}
+        <div className="flex items-center bg-black/70 p-1 rounded-xl border border-purple-900/40">
+          <button
+            onClick={() => onChangeView('ficha')}
+            className={`px-3 py-1 rounded-lg text-xs font-cinzel font-bold transition-all ${
+              activeView === 'ficha'
+                ? 'bg-purple-700 text-white shadow'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Minha Ficha
+          </button>
+          <button
+            onClick={() => onChangeView('campanha')}
+            className={`px-3 py-1 rounded-lg text-xs font-cinzel font-bold transition-all ${
+              activeView === 'campanha'
+                ? 'bg-purple-700 text-white shadow'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Campanha
+          </button>
         </div>
 
         {/* Action Buttons */}
@@ -151,6 +180,23 @@ export default function HeaderNav({
               </span>
             )}
           </button>
+
+          {user ? (
+          <button
+            onClick={onLogout}
+            className="px-2.5 py-1.5 rounded-lg bg-neutral-900 hover:bg-red-950/50 border border-neutral-700 text-slate-300 text-xs"
+            title={`Logado como ${user.email} (Clique para sair)`}
+          >
+            Sair
+          </button>
+        ) : (
+          <button
+            onClick={onOpenAuth}
+            className="px-3 py-1.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-200 text-xs font-semibold"
+          >
+            Entrar
+          </button>
+        )}
         </div>
       </div>
     </header>

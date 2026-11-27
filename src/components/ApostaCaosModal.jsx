@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   ShieldAlert, 
@@ -12,13 +12,16 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { rollDie, playDiceSound } from '../utils/diceRoller';
+import { supabase } from '../lib/supabase';
 
 export default function ApostaCaosModal({
   isOpen,
   onClose,
   character,
   onUpdateCharacter,
-  onAddLog
+  onAddLog,
+  activeCampaign,
+  user
 }) {
   const [desejoText, setDesejoText] = useState('');
   const [isRolling, setIsRolling] = useState(false);
@@ -33,10 +36,40 @@ export default function ApostaCaosModal({
   const [digitalPlayerSum, setDigitalPlayerSum] = useState(null);
   const [apostaConcluded, setApostaConcluded] = useState(false);
   const [wonAposta, setWonAposta] = useState(null);
-
-  if (!isOpen) return null;
+  const [liveBet, setLiveBet] = useState(null);
 
   const currentPC = character.pontosCaos || 1;
+
+  // Escuta a resposta do Mestre em tempo real quando estiver em uma campanha ativa
+  useEffect(() => {
+    if (!supabase || !liveBet?.id || liveBet.status !== 'pending') return;
+
+    const channel = supabase
+      .channel(`chaos-bet-${liveBet.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'chaos_bets',
+          filter: `id=eq.${liveBet.id}`
+        },
+        (payload) => {
+          const updated = payload.new;
+          setLiveBet(updated);
+          if ((updated.status === 'player_won' || updated.status === 'gm_won') && !apostaConcluded) {
+            handleConcludeAposta(updated.status === 'player_won', updated.player_total);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [liveBet?.id, liveBet?.status, apostaConcluded]);
+
+  if (!isOpen) return null;
 
   // Handle rolling ONLY the player's 8D8
   const handleRollPlayerDice = () => {
@@ -47,9 +80,10 @@ export default function ApostaCaosModal({
 
     setIsRolling(true);
     setApostaConcluded(false);
+    setLiveBet(null);
     playDiceSound('roll');
 
-    setTimeout(() => {
+    setTimeout(async () => {
       // ONLY roll the person's dice (8D8)
       const dice = Array.from({ length: 8 }, () => rollDie(8));
       const sum = dice.reduce((a, b) => a + b, 0);
@@ -57,6 +91,27 @@ export default function ApostaCaosModal({
       setDigitalPlayerDice(dice);
       setDigitalPlayerSum(sum);
       setIsRolling(false);
+
+      // Envia a aposta ao vivo para a tela de todos (incluindo o Escudo do Mestre)
+      if (supabase && activeCampaign && user) {
+        const { data } = await supabase
+          .from('chaos_bets')
+          .insert({
+            campaign_id: activeCampaign.id,
+            player_user_id: user.id,
+            player_name: character.nome || user.email?.split('@')[0] || 'Jogador',
+            desejo: desejoText || 'Desejo Primordial',
+            player_dice: dice,
+            player_total: sum,
+            status: 'pending'
+          })
+          .select()
+          .single();
+
+        if (data) {
+          setLiveBet(data);
+        }
+      }
     }, 700);
   };
 
@@ -186,6 +241,7 @@ export default function ApostaCaosModal({
                 setUsePhysicalDice(e.target.checked);
                 setDigitalPlayerDice(null);
                 setApostaConcluded(false);
+                setLiveBet(null);
               }}
               className="rounded accent-red-600 w-4 h-4 cursor-pointer"
             />
@@ -260,6 +316,24 @@ export default function ApostaCaosModal({
                     </span>
                   ))}
                 </div>
+
+                {/* Status da Aposta ao Vivo na Campanha */}
+                {liveBet && (
+                  <div className="p-2.5 rounded-lg bg-black/50 border border-amber-500/30 text-xs space-y-1">
+                    {liveBet.status === 'pending' ? (
+                      <p className="text-amber-300 font-semibold animate-pulse">
+                        Aposta enviada para a tela de todos! Aguardando o Mestre rolar os 8D8 dele...
+                      </p>
+                    ) : (
+                      <p className="text-slate-200 font-mono">
+                        Rolagem do Mestre: <strong className="text-red-400 text-sm">{liveBet.gm_total}</strong>{' '}
+                        <span className="text-[10px] text-slate-400">
+                          [{Array.isArray(liveBet.gm_dice) ? liveBet.gm_dice.join(', ') : ''}]
+                        </span>
+                      </p>
+                    )}
+                  </div>
+                )}
 
                 {!apostaConcluded && (
                   <div className="pt-2 border-t border-purple-900/30">

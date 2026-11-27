@@ -132,14 +132,23 @@ export default function CharacterSheet({
       character.habilidadesAtuacao,
       character.habilidadesCaminho
     );
-    onChange({
+    const nextChar = {
       ...character,
       nivelPessoal: clampedNivel,
       ...synced
+    };
+    const nextMaxVida = calculateMaxVida(nextChar);
+    const nextMaxEq = calculateMaxEquilibrio(nextChar);
+
+    onChange({
+      ...nextChar,
+      vidaAtual: !character.vidaEditada ? nextMaxVida : character.vidaAtual,
+      equilibrioAtual: !character.equilibrioEditada ? nextMaxEq : character.equilibrioAtual,
+      sanidadeAtual: !character.equilibrioEditada ? nextMaxEq : character.sanidadeAtual
     });
   };
 
-  // Alterar Atuação e preencher habilidade inata
+  // Alterar Atuação e preencher habilidade inata e status máximos iniciais
   const handleAtuacaoChange = (newAtuacaoId) => {
     const synced = buildAutomatedAbilities(
       newAtuacaoId,
@@ -148,10 +157,19 @@ export default function CharacterSheet({
       character.habilidadesAtuacao,
       character.habilidadesCaminho
     );
-    onChange({
+    const nextChar = {
       ...character,
       atuacao: newAtuacaoId,
       habilidadesAtuacao: synced.habilidadesAtuacao
+    };
+    const nextMaxVida = calculateMaxVida(nextChar);
+    const nextMaxEq = calculateMaxEquilibrio(nextChar);
+
+    onChange({
+      ...nextChar,
+      vidaAtual: !character.vidaEditada ? nextMaxVida : character.vidaAtual,
+      equilibrioAtual: !character.equilibrioEditada ? nextMaxEq : character.equilibrioAtual,
+      sanidadeAtual: !character.equilibrioEditada ? nextMaxEq : character.sanidadeAtual
     });
   };
 
@@ -191,9 +209,18 @@ export default function CharacterSheet({
   };
 
   const updateAtributo = (attr, die) => {
-    onChange({
+    const nextChar = {
       ...character,
       atributos: { ...character.atributos, [attr]: die }
+    };
+    const nextMaxVida = calculateMaxVida(nextChar);
+    const nextMaxEq = calculateMaxEquilibrio(nextChar);
+
+    onChange({
+      ...nextChar,
+      vidaAtual: !character.vidaEditada ? nextMaxVida : character.vidaAtual,
+      equilibrioAtual: !character.equilibrioEditada ? nextMaxEq : character.equilibrioAtual,
+      sanidadeAtual: !character.equilibrioEditada ? nextMaxEq : character.sanidadeAtual
     });
   };
 
@@ -305,7 +332,7 @@ export default function CharacterSheet({
     item => character.nivelMao?.genesis?.[item.nivel]
   );
 
-  const currentVida = character.vidaAtual || (maxVida > 0 ? maxVida : 0);
+  const currentVida = character.vidaAtual ?? (maxVida > 0 ? maxVida : 0);
   const currentEquilibrio = character.equilibrioAtual ?? character.sanidadeAtual ?? (maxEquilibrio > 0 ? maxEquilibrio : 0);
 
   return (
@@ -544,7 +571,14 @@ export default function CharacterSheet({
                 <input
                   type="number"
                   value={currentVida}
-                  onChange={(e) => updateField('vidaAtual', parseInt(e.target.value, 10) || 0)}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value, 10) || 0;
+                    onChange({
+                      ...character,
+                      vidaAtual: val,
+                      vidaEditada: true
+                    });
+                  }}
                   className="w-12 text-center bg-neutral-900 text-red-300 font-bold text-sm rounded py-0.5 border border-neutral-700 focus:outline-none"
                 />
                 <span className="text-slate-400">/ {maxVida}</span>
@@ -563,21 +597,41 @@ export default function CharacterSheet({
               <div className="flex gap-1">
                 <button
                   type="button"
-                  onClick={() => updateField('vidaAtual', Math.max(0, currentVida - 1))}
+                  onClick={() => {
+                    const val = Math.max(0, currentVida - 1);
+                    onChange({
+                      ...character,
+                      vidaAtual: val,
+                      vidaEditada: true
+                    });
+                  }}
                   className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-slate-200"
                 >
                   -1
                 </button>
                 <button
                   type="button"
-                  onClick={() => updateField('vidaAtual', Math.min(maxVida, currentVida + 1))}
+                  onClick={() => {
+                    const val = Math.min(maxVida, currentVida + 1);
+                    onChange({
+                      ...character,
+                      vidaAtual: val,
+                      vidaEditada: true
+                    });
+                  }}
                   className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-slate-200"
                 >
                   +1
                 </button>
                 <button
                   type="button"
-                  onClick={() => updateField('vidaAtual', maxVida)}
+                  onClick={() => {
+                    onChange({
+                      ...character,
+                      vidaAtual: maxVida,
+                      vidaEditada: true
+                    });
+                  }}
                   className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-emerald-400"
                 >
                   Full
@@ -601,7 +655,8 @@ export default function CharacterSheet({
                     onChange({
                       ...character,
                       equilibrioAtual: val,
-                      sanidadeAtual: val
+                      sanidadeAtual: val,
+                      equilibrioEditada: true
                     });
                   }}
                   className="w-12 text-center bg-neutral-900 text-indigo-300 font-bold text-sm rounded py-0.5 border border-neutral-700 focus:outline-none"
@@ -624,7 +679,12 @@ export default function CharacterSheet({
                   type="button"
                   onClick={() => {
                     const val = Math.max(0, currentEquilibrio - 1);
-                    onChange({ ...character, equilibrioAtual: val, sanidadeAtual: val });
+                    onChange({
+                      ...character,
+                      equilibrioAtual: val,
+                      sanidadeAtual: val,
+                      equilibrioEditada: true
+                    });
                   }}
                   className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-slate-200"
                 >
@@ -634,7 +694,12 @@ export default function CharacterSheet({
                   type="button"
                   onClick={() => {
                     const val = Math.min(maxEquilibrio, currentEquilibrio + 1);
-                    onChange({ ...character, equilibrioAtual: val, sanidadeAtual: val });
+                    onChange({
+                      ...character,
+                      equilibrioAtual: val,
+                      sanidadeAtual: val,
+                      equilibrioEditada: true
+                    });
                   }}
                   className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-slate-200"
                 >
@@ -643,7 +708,12 @@ export default function CharacterSheet({
                 <button
                   type="button"
                   onClick={() => {
-                    onChange({ ...character, equilibrioAtual: maxEquilibrio, sanidadeAtual: maxEquilibrio });
+                    onChange({
+                      ...character,
+                      equilibrioAtual: maxEquilibrio,
+                      sanidadeAtual: maxEquilibrio,
+                      equilibrioEditada: true
+                    });
                   }}
                   className="px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700 text-emerald-400"
                 >

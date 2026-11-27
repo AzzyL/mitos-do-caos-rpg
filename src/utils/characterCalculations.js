@@ -34,7 +34,9 @@ export const INITIAL_CHARACTER = {
 
   // Status Vitais Atuais (Os máximos são calculados automaticamente)
   vidaAtual: 0,
+  vidaEditada: false,
   equilibrioAtual: 0,
+  equilibrioEditada: false,
   akashaAtual: 2,
 
   // Nível de Mão
